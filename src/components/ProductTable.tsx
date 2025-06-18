@@ -19,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Edit, Filter, Download, Upload } from 'lucide-react';
+import { Edit, Filter, Download, Upload, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface Product {
   sku: string;
@@ -68,6 +69,7 @@ const sampleProducts: Product[] = [
 ];
 
 export const ProductTable: React.FC = () => {
+  const navigate = useNavigate();
   const [products] = useState<Product[]>(sampleProducts);
   const [filtroMarca, setFiltroMarca] = useState<string>('');
   const [filtroBusca, setFiltroBusca] = useState<string>('');
@@ -80,45 +82,48 @@ export const ProductTable: React.FC = () => {
   };
 
   const getMargemColor = (margem: number) => {
-    if (margem >= 20) return 'bg-green-100 text-green-800';
-    if (margem >= 15) return 'bg-yellow-100 text-yellow-800';
+    if (margem >= 20) return 'bg-emerald-100 text-emerald-800';
+    if (margem >= 15) return 'bg-amber-100 text-amber-800';
     return 'bg-red-100 text-red-800';
   };
 
   const getEstoqueColor = (estoque: number) => {
     if (estoque === 0) return 'bg-red-100 text-red-800';
-    if (estoque <= 5) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-green-100 text-green-800';
+    if (estoque <= 5) return 'bg-amber-100 text-amber-800';
+    return 'bg-emerald-100 text-emerald-800';
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestão de Produtos</h1>
-          <p className="text-gray-600 mt-2">Controle de preços e margens por plataforma</p>
+          <h1 className="text-3xl font-bold text-orange-900">Gestão de Pneus</h1>
+          <p className="text-orange-700 mt-2">Controle de preços e margens por plataforma</p>
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline">
+          <Button variant="outline" className="border-orange-200 text-orange-700 hover:bg-orange-50">
             <Upload className="w-4 h-4 mr-2" />
             Importar
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" className="border-orange-200 text-orange-700 hover:bg-orange-50">
             <Download className="w-4 h-4 mr-2" />
             Exportar
           </Button>
-          <Button>
-            <Edit className="w-4 h-4 mr-2" />
-            Novo Produto
+          <Button 
+            onClick={() => navigate('/cadastrar')}
+            className="bg-orange-600 hover:bg-orange-700 text-white"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Pneu
           </Button>
         </div>
       </div>
 
-      <Card>
+      <Card className="border-orange-200">
         <CardHeader>
           <div className="flex justify-between items-center">
-            <CardTitle>Filtros</CardTitle>
-            <Button variant="outline" size="sm">
+            <CardTitle className="text-orange-800">Filtros</CardTitle>
+            <Button variant="outline" size="sm" className="border-orange-200 text-orange-700 hover:bg-orange-50">
               <Filter className="w-4 h-4 mr-2" />
               Filtros Avançados
             </Button>
@@ -127,17 +132,18 @@ export const ProductTable: React.FC = () => {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Buscar</label>
+              <label className="text-sm font-medium mb-2 block text-orange-800">Buscar</label>
               <Input
                 placeholder="SKU, produto..."
                 value={filtroBusca}
                 onChange={(e) => setFiltroBusca(e.target.value)}
+                className="focus:ring-orange-500 focus:border-orange-500 border-orange-200"
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Marca</label>
+              <label className="text-sm font-medium mb-2 block text-orange-800">Marca</label>
               <Select value={filtroMarca} onValueChange={setFiltroMarca}>
-                <SelectTrigger>
+                <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500 border-orange-200">
                   <SelectValue placeholder="Todas as marcas" />
                 </SelectTrigger>
                 <SelectContent>
@@ -148,9 +154,9 @@ export const ProductTable: React.FC = () => {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Plataforma</label>
+              <label className="text-sm font-medium mb-2 block text-orange-800">Plataforma</label>
               <Select>
-                <SelectTrigger>
+                <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500 border-orange-200">
                   <SelectValue placeholder="Todas as plataformas" />
                 </SelectTrigger>
                 <SelectContent>
@@ -165,30 +171,30 @@ export const ProductTable: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border-orange-200">
         <CardHeader>
-          <CardTitle>Produtos ({products.length})</CardTitle>
+          <CardTitle className="text-orange-800">Pneus ({products.length})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>SKU</TableHead>
-                  <TableHead>Produto</TableHead>
-                  <TableHead>Estoque</TableHead>
-                  <TableHead>Custo</TableHead>
-                  <TableHead>Marca</TableHead>
-                  <TableHead>Magalu</TableHead>
-                  <TableHead>ML Clássico</TableHead>
-                  <TableHead>ML Premium</TableHead>
-                  <TableHead>Ações</TableHead>
+                <TableRow className="border-orange-200">
+                  <TableHead className="text-orange-800">SKU</TableHead>
+                  <TableHead className="text-orange-800">Produto</TableHead>
+                  <TableHead className="text-orange-800">Estoque</TableHead>
+                  <TableHead className="text-orange-800">Custo</TableHead>
+                  <TableHead className="text-orange-800">Marca</TableHead>
+                  <TableHead className="text-orange-800">Magalu</TableHead>
+                  <TableHead className="text-orange-800">ML Clássico</TableHead>
+                  <TableHead className="text-orange-800">ML Premium</TableHead>
+                  <TableHead className="text-orange-800">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {products.map((product) => (
-                  <TableRow key={product.sku}>
-                    <TableCell className="font-medium">{product.sku}</TableCell>
+                  <TableRow key={product.sku} className="border-orange-100 hover:bg-orange-50/30">
+                    <TableCell className="font-medium text-orange-900">{product.sku}</TableCell>
                     <TableCell className="max-w-xs">
                       <div className="truncate" title={product.produto}>
                         {product.produto}
@@ -199,9 +205,11 @@ export const ProductTable: React.FC = () => {
                         {product.estoque}
                       </Badge>
                     </TableCell>
-                    <TableCell>{formatCurrency(product.custo)}</TableCell>
+                    <TableCell className="font-medium">{formatCurrency(product.custo)}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{product.marca}</Badge>
+                      <Badge variant="outline" className="border-orange-200 text-orange-800">
+                        {product.marca}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
@@ -228,7 +236,11 @@ export const ProductTable: React.FC = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="hover:bg-orange-100 text-orange-600"
+                      >
                         <Edit className="w-4 h-4" />
                       </Button>
                     </TableCell>

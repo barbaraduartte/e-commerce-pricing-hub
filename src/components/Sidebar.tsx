@@ -9,12 +9,14 @@ import {
   Upload, 
   Download,
   Users,
-  Settings
+  Settings,
+  Plus
 } from 'lucide-react';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
   { icon: Package, label: 'Produtos', path: '/produtos' },
+  { icon: Plus, label: 'Cadastrar Pneu', path: '/cadastrar' },
   { icon: DollarSign, label: 'Precificação', path: '/precificacao' },
   { icon: History, label: 'Histórico', path: '/historico' },
   { icon: Upload, label: 'Importar', path: '/importar' },
@@ -25,10 +27,10 @@ const menuItems = [
 
 export const Sidebar: React.FC = () => {
   return (
-    <div className="w-64 bg-slate-900 text-white">
-      <div className="p-6">
-        <h1 className="text-xl font-bold text-blue-400">PricingPro</h1>
-        <p className="text-sm text-gray-400 mt-1">Sistema de Precificação</p>
+    <div className="w-64 bg-gradient-to-b from-orange-900 via-orange-800 to-orange-900 text-white shadow-2xl">
+      <div className="p-6 border-b border-orange-700/50">
+        <h1 className="text-xl font-bold text-orange-200">TirePricePro</h1>
+        <p className="text-sm text-orange-300 mt-1">Sistema de Precificação de Pneus</p>
       </div>
       
       <nav className="mt-6">
@@ -37,10 +39,10 @@ export const Sidebar: React.FC = () => {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center px-6 py-3 text-sm font-medium transition-colors ${
+              `flex items-center px-6 py-3 text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-blue-600 text-white border-r-2 border-blue-400'
-                  : 'text-gray-300 hover:bg-slate-800 hover:text-white'
+                  ? 'bg-orange-600 text-white border-r-4 border-orange-400 shadow-lg'
+                  : 'text-orange-200 hover:bg-orange-800/50 hover:text-white hover:border-r-2 hover:border-orange-500'
               }`
             }
           >
