@@ -147,7 +147,7 @@ export const ProductTable: React.FC = () => {
                   <SelectValue placeholder="Todas as marcas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas as marcas</SelectItem>
+                  <SelectItem value="all">Todas as marcas</SelectItem>
                   <SelectItem value="MICHELIN">MICHELIN</SelectItem>
                   <SelectItem value="B1">B1</SelectItem>
                 </SelectContent>
@@ -160,7 +160,7 @@ export const ProductTable: React.FC = () => {
                   <SelectValue placeholder="Todas as plataformas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Todas as plataformas</SelectItem>
+                  <SelectItem value="all">Todas as plataformas</SelectItem>
                   <SelectItem value="magalu">Magalu</SelectItem>
                   <SelectItem value="ml-classico">ML Clássico</SelectItem>
                   <SelectItem value="ml-premium">ML Premium</SelectItem>
