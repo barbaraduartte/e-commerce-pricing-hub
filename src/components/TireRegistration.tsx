@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/select';
 import { Save, RotateCcw, Package } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useProducts } from '../contexts/ProductContext';
+import { useNavigate } from 'react-router-dom';
 
 interface TireData {
   sku: string;
@@ -33,7 +35,8 @@ const marcasPneus = [
   'MICHELIN', 'BRIDGESTONE', 'GOODYEAR', 'PIRELLI', 'CONTINENTAL',
   'DUNLOP', 'YOKOHAMA', 'TOYO', 'KUMHO', 'HANKOOK', 'NEXEN',
   'MAXXIS', 'FALKEN', 'NITTO', 'BF GOODRICH', 'GENERAL',
-  'COOPER', 'UNIROYAL', 'FIRESTONE', 'OUTROS'
+  'COOPER', 'UNIROYAL', 'FIRESTONE', 'B1', 'ALTRI', 'ROADSTONE',
+  'TRIANGLE', 'DOUBLESTAR', 'LINGLONG', 'HIFLY', 'SUNFULL', 'OUTROS'
 ];
 
 const categoriasPneus = [
@@ -43,6 +46,9 @@ const categoriasPneus = [
 
 export const TireRegistration: React.FC = () => {
   const { toast } = useToast();
+  const { addProduct } = useProducts();
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState<TireData>({
     sku: '',
     produto: '',
@@ -88,6 +94,22 @@ export const TireRegistration: React.FC = () => {
     });
   };
 
+  const calculateInitialPrices = (custo: number) => {
+    // Preços iniciais com margens básicas
+    const precoMagalu = custo * 1.25; // 25% markup
+    const precoMLClassico = custo * 1.22; // 22% markup
+    const precoMLPremium = custo * 1.28; // 28% markup
+
+    return {
+      precoMagalu,
+      margemMagalu: ((precoMagalu - custo) / precoMagalu * 100) - 12.5, // Desconta comissão padrão
+      precoMLClassico,
+      margemMLClassico: ((precoMLClassico - custo) / precoMLClassico * 100) - 15.0,
+      precoMLPremium,
+      margemMLPremium: ((precoMLPremium - custo) / precoMLPremium * 100) - 18.0,
+    };
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -101,8 +123,25 @@ export const TireRegistration: React.FC = () => {
       return;
     }
 
-    // Simular salvamento
+    // Calcular preços iniciais
+    const prices = calculateInitialPrices(formData.custo);
+
+    // Criar objeto do produto
+    const newProduct = {
+      sku: formData.sku,
+      produto: formData.produto,
+      estoque: formData.estoque,
+      custo: formData.custo,
+      marca: formData.marca,
+      ...prices,
+      ultimaAlteracao: new Date().toISOString().split('T')[0],
+    };
+
+    // Adicionar ao contexto global
+    addProduct(newProduct);
+    
     console.log('Dados do pneu cadastrado:', formData);
+    console.log('Produto adicionado:', newProduct);
     
     toast({
       title: "Pneu cadastrado com sucesso!",
@@ -111,6 +150,11 @@ export const TireRegistration: React.FC = () => {
     });
 
     resetForm();
+    
+    // Redirecionar para a página de produtos após 2 segundos
+    setTimeout(() => {
+      navigate('/produtos');
+    }, 2000);
   };
 
   return (

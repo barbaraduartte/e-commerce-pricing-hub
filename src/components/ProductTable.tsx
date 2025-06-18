@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,58 +21,25 @@ import {
 } from '@/components/ui/select';
 import { Edit, Filter, Download, Upload, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-interface Product {
-  sku: string;
-  produto: string;
-  estoque: number;
-  custo: number;
-  marca: string;
-  precoMagalu: number;
-  margemMagalu: number;
-  precoMLClassico: number;
-  margemMLClassico: number;
-  precoMLPremium: number;
-  margemMLPremium: number;
-  ultimaAlteracao: string;
-}
-
-const sampleProducts: Product[] = [
-  {
-    sku: '57163',
-    produto: 'Pneu 235/45R19 99W Sunset Ventura HP B1',
-    estoque: 12,
-    custo: 380.00,
-    marca: 'B1',
-    precoMagalu: 465.00,
-    margemMagalu: 18.2,
-    precoMLClassico: 450.00,
-    margemMLClassico: 15.8,
-    precoMLPremium: 480.00,
-    margemMLPremium: 20.1,
-    ultimaAlteracao: '2024-06-18',
-  },
-  {
-    sku: '22263',
-    produto: '255/35R20 PILOT SPORT 4S EXTRA LOAD 97Y MICHELIN',
-    estoque: 7,
-    custo: 1050.00,
-    marca: 'MICHELIN',
-    precoMagalu: 1280.00,
-    margemMagalu: 18.0,
-    precoMLClassico: 1250.00,
-    margemMLClassico: 16.0,
-    precoMLPremium: 1320.00,
-    margemMLPremium: 20.5,
-    ultimaAlteracao: '2024-06-18',
-  },
-];
+import { useProducts } from '../contexts/ProductContext';
 
 export const ProductTable: React.FC = () => {
   const navigate = useNavigate();
-  const [products] = useState<Product[]>(sampleProducts);
-  const [filtroMarca, setFiltroMarca] = useState<string>('');
+  const { products, getAllBrands } = useProducts();
+  const [filtroMarca, setFiltroMarca] = useState<string>('all');
   const [filtroBusca, setFiltroBusca] = useState<string>('');
+  const [filtroPlataforma, setFiltroPlataforma] = useState<string>('all');
+
+  const brands = getAllBrands();
+
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const matchesBusca = product.sku.toLowerCase().includes(filtroBusca.toLowerCase()) ||
+                          product.produto.toLowerCase().includes(filtroBusca.toLowerCase());
+      const matchesMarca = filtroMarca === 'all' || product.marca === filtroMarca;
+      return matchesBusca && matchesMarca;
+    });
+  }, [products, filtroBusca, filtroMarca]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -148,14 +115,15 @@ export const ProductTable: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas as marcas</SelectItem>
-                  <SelectItem value="MICHELIN">MICHELIN</SelectItem>
-                  <SelectItem value="B1">B1</SelectItem>
+                  {brands.map(marca => (
+                    <SelectItem key={marca} value={marca}>{marca}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <label className="text-sm font-medium mb-2 block text-orange-800">Plataforma</label>
-              <Select>
+              <Select value={filtroPlataforma} onValueChange={setFiltroPlataforma}>
                 <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500 border-orange-200">
                   <SelectValue placeholder="Todas as plataformas" />
                 </SelectTrigger>
@@ -173,7 +141,7 @@ export const ProductTable: React.FC = () => {
 
       <Card className="border-orange-200">
         <CardHeader>
-          <CardTitle className="text-orange-800">Pneus ({products.length})</CardTitle>
+          <CardTitle className="text-orange-800">Pneus ({filteredProducts.length})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -192,7 +160,7 @@ export const ProductTable: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {products.map((product) => (
+                {filteredProducts.map((product) => (
                   <TableRow key={product.sku} className="border-orange-100 hover:bg-orange-50/30">
                     <TableCell className="font-medium text-orange-900">{product.sku}</TableCell>
                     <TableCell className="max-w-xs">
