@@ -27,10 +27,10 @@ const menuItems = [
 
 export const Sidebar: React.FC = () => {
   return (
-    <div className="w-64 bg-gradient-to-b from-orange-900 via-orange-800 to-orange-900 text-white shadow-2xl">
-      <div className="p-6 border-b border-orange-700/50">
-        <h1 className="text-xl font-bold text-orange-200">TirePricePro</h1>
-        <p className="text-sm text-orange-300 mt-1">Sistema de Precificação de Pneus</p>
+    <div className="w-64 bg-gradient-to-b from-blue-900 via-blue-800 to-blue-900 text-white shadow-2xl">
+      <div className="p-6 border-b border-blue-700/50">
+        <h1 className="text-xl font-bold text-blue-200">TirePricePro</h1>
+        <p className="text-sm text-blue-300 mt-1">Sistema de Precificação de Pneus</p>
       </div>
       
       <nav className="mt-6">
@@ -41,8 +41,8 @@ export const Sidebar: React.FC = () => {
             className={({ isActive }) =>
               `flex items-center px-6 py-3 text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? 'bg-orange-600 text-white border-r-4 border-orange-400 shadow-lg'
-                  : 'text-orange-200 hover:bg-orange-800/50 hover:text-white hover:border-r-2 hover:border-orange-500'
+                  ? 'bg-blue-600 text-white border-r-4 border-blue-400 shadow-lg'
+                  : 'text-blue-200 hover:bg-blue-800/50 hover:text-white hover:border-r-2 hover:border-blue-500'
               }`
             }
           >

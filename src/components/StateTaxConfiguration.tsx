@@ -32,7 +32,7 @@ export const StateTaxConfiguration: React.FC = () => {
       toast({
         title: "Imposto atualizado!",
         description: `Imposto para ${currentStateTax.stateName} foi salvo com sucesso.`,
-        className: "bg-orange-50 border-orange-200 text-orange-800",
+        className: "bg-blue-50 border-blue-200 text-blue-800",
       });
     }
   };
@@ -44,9 +44,9 @@ export const StateTaxConfiguration: React.FC = () => {
   }, [currentStateTax]);
 
   return (
-    <Card className="border-orange-200">
+    <Card className="border-blue-200">
       <CardHeader>
-        <CardTitle className="text-orange-800 flex items-center">
+        <CardTitle className="text-blue-800 flex items-center">
           <MapPin className="w-5 h-5 mr-2" />
           Impostos por Estado
         </CardTitle>
@@ -55,7 +55,7 @@ export const StateTaxConfiguration: React.FC = () => {
         <div>
           <label className="text-sm font-medium mb-2 block">Estado</label>
           <Select value={selectedState} onValueChange={handleStateChange}>
-            <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500">
+            <SelectTrigger className="focus:ring-blue-500 focus:border-blue-500">
               <SelectValue placeholder="Selecione um estado" />
             </SelectTrigger>
             <SelectContent className="bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
@@ -71,7 +71,7 @@ export const StateTaxConfiguration: React.FC = () => {
         {currentStateTax && (
           <>
             <div className="flex items-center space-x-2 mb-4">
-              <Badge className="bg-orange-100 text-orange-800">
+              <Badge className="bg-blue-100 text-blue-800">
                 {currentStateTax.stateName}
               </Badge>
             </div>
@@ -83,19 +83,19 @@ export const StateTaxConfiguration: React.FC = () => {
                 step="0.01"
                 value={editingTax}
                 onChange={(e) => setEditingTax(e.target.value)}
-                className="focus:ring-orange-500 focus:border-orange-500"
+                className="focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
-            <div className="bg-orange-50 p-3 rounded-lg">
-              <div className="text-sm font-medium text-orange-800">
+            <div className="bg-blue-50 p-3 rounded-lg">
+              <div className="text-sm font-medium text-blue-800">
                 Imposto para {currentStateTax.stateName}: {currentStateTax.taxPercentage.toFixed(2)}%
               </div>
             </div>
 
             <Button 
               onClick={saveTax}
-              className="w-full bg-orange-600 hover:bg-orange-700"
+              className="w-full bg-blue-600 hover:bg-blue-700"
             >
               <Save className="w-4 h-4 mr-2" />
               Salvar Imposto para {currentStateTax.stateName}

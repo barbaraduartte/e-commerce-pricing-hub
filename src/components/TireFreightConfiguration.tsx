@@ -30,7 +30,7 @@ export const TireFreightConfiguration: React.FC = () => {
     toast({
       title: "Configuração do pneu atualizada!",
       description: "As medidas foram salvas e o frete foi recalculado.",
-      className: "bg-orange-50 border-orange-200 text-orange-800",
+      className: "bg-blue-50 border-blue-200 text-blue-800",
     });
   };
 
@@ -42,9 +42,9 @@ export const TireFreightConfiguration: React.FC = () => {
   };
 
   return (
-    <Card className="border-orange-200">
+    <Card className="border-blue-200">
       <CardHeader>
-        <CardTitle className="text-orange-800 flex items-center">
+        <CardTitle className="text-blue-800 flex items-center">
           <Package className="w-5 h-5 mr-2" />
           Configuração do Pneu - Frete ML
         </CardTitle>
@@ -58,7 +58,7 @@ export const TireFreightConfiguration: React.FC = () => {
               placeholder="Ex: 235"
               value={editingConfig.width}
               onChange={(e) => setEditingConfig(prev => ({ ...prev, width: e.target.value }))}
-              className="focus:ring-orange-500 focus:border-orange-500"
+              className="focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div>
@@ -68,7 +68,7 @@ export const TireFreightConfiguration: React.FC = () => {
               placeholder="Ex: 50"
               value={editingConfig.height}
               onChange={(e) => setEditingConfig(prev => ({ ...prev, height: e.target.value }))}
-              className="focus:ring-orange-500 focus:border-orange-500"
+              className="focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div>
@@ -78,7 +78,7 @@ export const TireFreightConfiguration: React.FC = () => {
               placeholder="Ex: 19"
               value={editingConfig.diameter}
               onChange={(e) => setEditingConfig(prev => ({ ...prev, diameter: e.target.value }))}
-              className="focus:ring-orange-500 focus:border-orange-500"
+              className="focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           <div>
@@ -87,7 +87,7 @@ export const TireFreightConfiguration: React.FC = () => {
               value={editingConfig.quantity} 
               onValueChange={(value) => setEditingConfig(prev => ({ ...prev, quantity: value }))}
             >
-              <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500">
+              <SelectTrigger className="focus:ring-blue-500 focus:border-blue-500">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -99,7 +99,7 @@ export const TireFreightConfiguration: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-orange-50 p-4 rounded-lg space-y-2">
+        <div className="bg-blue-50 p-4 rounded-lg space-y-2">
           <div className="text-sm">
             <strong>Peso Volumétrico:</strong> {calculateVolumetricWeight().toFixed(4)} kg
           </div>
@@ -110,7 +110,7 @@ export const TireFreightConfiguration: React.FC = () => {
 
         <Button 
           onClick={saveConfig}
-          className="w-full bg-orange-600 hover:bg-orange-700"
+          className="w-full bg-blue-600 hover:bg-blue-700"
         >
           <Save className="w-4 h-4 mr-2" />
           Salvar Configuração do Pneu

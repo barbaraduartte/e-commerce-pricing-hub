@@ -89,35 +89,36 @@ export const ShippingProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   const calculateVolumetricWeight = () => {
-    // Cálculo baseado na sua planilha: (largura * altura * aro * quantidade) / 10000
+    // Baseado na sua planilha: Largura * Altura * Aro * Quantidade / 10000
     const { width, height, diameter, quantity } = tireConfig;
     return (width * height * diameter * quantity) / 10000;
   };
 
   const calculateFreight = () => {
-    const volumetricWeight = calculateVolumetricWeight();
+    const W11 = calculateVolumetricWeight();
     
-    // Fórmula exata da sua planilha do Excel
-    if (volumetricWeight === 0) return 0;
-    if (volumetricWeight > 0 && volumetricWeight <= 0.3) return 19.95;
-    if (volumetricWeight > 0.3 && volumetricWeight <= 0.5) return 21.45;
-    if (volumetricWeight > 0.5 && volumetricWeight <= 1) return 22.45;
-    if (volumetricWeight > 1 && volumetricWeight <= 2) return 23.45;
-    if (volumetricWeight > 2 && volumetricWeight <= 3) return 24.95;
-    if (volumetricWeight > 3 && volumetricWeight <= 4) return 26.95;
-    if (volumetricWeight > 4 && volumetricWeight <= 5) return 28.45;
-    if (volumetricWeight > 5 && volumetricWeight <= 9) return 44.45;
-    if (volumetricWeight > 9 && volumetricWeight <= 13) return 65.95;
-    if (volumetricWeight > 13 && volumetricWeight <= 17) return 73.45;
-    if (volumetricWeight > 17 && volumetricWeight <= 23) return 85.95;
-    if (volumetricWeight > 23 && volumetricWeight <= 30) return 98.95;
-    if (volumetricWeight > 30 && volumetricWeight <= 40) return 109.45;
-    if (volumetricWeight > 40 && volumetricWeight <= 50) return 116.95;
-    if (volumetricWeight > 50 && volumetricWeight <= 60) return 124.95;
-    if (volumetricWeight > 60 && volumetricWeight <= 70) return 141.45;
-    if (volumetricWeight > 70 && volumetricWeight <= 80) return 156.95;
+    // Implementação exata da sua fórmula Excel:
+    // =SE(W11="";"";SE(E(W11>0;W11<=0,3);19,95; SE(E(W11>0,3;W11<=0,5);21,45; ...
+    if (W11 === 0 || W11 === null || W11 === undefined) return 0;
+    if (W11 > 0 && W11 <= 0.3) return 19.95;
+    if (W11 > 0.3 && W11 <= 0.5) return 21.45;
+    if (W11 > 0.5 && W11 <= 1) return 22.45;
+    if (W11 > 1 && W11 <= 2) return 23.45;
+    if (W11 > 2 && W11 <= 3) return 24.95;
+    if (W11 > 3 && W11 <= 4) return 26.95;
+    if (W11 > 4 && W11 <= 5) return 28.45;
+    if (W11 > 5 && W11 <= 9) return 44.45;
+    if (W11 > 9 && W11 <= 13) return 65.95;
+    if (W11 > 13 && W11 <= 17) return 73.45;
+    if (W11 > 17 && W11 <= 23) return 85.95;
+    if (W11 > 23 && W11 <= 30) return 98.95;
+    if (W11 > 30 && W11 <= 40) return 109.45;
+    if (W11 > 40 && W11 <= 50) return 116.95;
+    if (W11 > 50 && W11 <= 60) return 124.95;
+    if (W11 > 60 && W11 <= 70) return 141.45;
+    if (W11 > 70 && W11 <= 80) return 156.95;
     
-    return 0; // Para valores fora da tabela
+    return 0; // Para valores fora da tabela ou inválidos
   };
 
   return (

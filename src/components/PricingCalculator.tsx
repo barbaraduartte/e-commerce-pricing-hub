@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -93,7 +92,7 @@ export const PricingCalculator: React.FC = () => {
     toast({
       title: "Comissões atualizadas!",
       description: "As novas comissões foram salvas com sucesso.",
-      className: "bg-orange-50 border-orange-200 text-orange-800",
+      className: "bg-blue-50 border-blue-200 text-blue-800",
     });
   };
 
@@ -103,13 +102,13 @@ export const PricingCalculator: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-orange-900">Calculadora de Precificação</h1>
-          <p className="text-orange-600 mt-2">Informe o custo e a margem desejada para calcular preços automáticos</p>
+          <h1 className="text-3xl font-bold text-blue-900">Calculadora de Precificação</h1>
+          <p className="text-blue-600 mt-2">Informe o custo e a margem desejada para calcular preços automáticos</p>
         </div>
         <Button
           variant="outline"
           onClick={() => setShowConfig(!showConfig)}
-          className="border-orange-200 text-orange-700 hover:bg-orange-50"
+          className="border-blue-200 text-blue-700 hover:bg-blue-50"
         >
           <Settings className="w-4 h-4 mr-2" />
           Configurações
@@ -118,9 +117,9 @@ export const PricingCalculator: React.FC = () => {
 
       {showConfig && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="border-orange-200">
+          <Card className="border-blue-200">
             <CardHeader>
-              <CardTitle className="text-orange-800">Comissões das Plataformas</CardTitle>
+              <CardTitle className="text-blue-800">Comissões das Plataformas</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {platforms.map((platform) => (
@@ -135,14 +134,14 @@ export const PricingCalculator: React.FC = () => {
                       ...prev,
                       [platform.name]: e.target.value
                     }))}
-                    className="w-24 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-24 focus:ring-blue-500 focus:border-blue-500"
                   />
                   <span className="text-sm text-gray-600">%</span>
                 </div>
               ))}
               <Button 
                 onClick={saveCommissions}
-                className="w-full bg-orange-600 hover:bg-orange-700"
+                className="w-full bg-blue-600 hover:bg-blue-700"
                 disabled={Object.keys(editingCommissions).length === 0}
               >
                 <Save className="w-4 h-4 mr-2" />
@@ -157,40 +156,40 @@ export const PricingCalculator: React.FC = () => {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-orange-200">
+        <Card className="border-blue-200">
           <CardHeader>
-            <CardTitle className="flex items-center text-orange-800">
+            <CardTitle className="flex items-center text-blue-800">
               <Calculator className="w-5 h-5 mr-2" />
               Dados de Entrada
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-2 block text-orange-800">Custo do Produto (R$)</label>
+              <label className="text-sm font-medium mb-2 block text-blue-800">Custo do Produto (R$)</label>
               <Input
                 type="number"
                 placeholder="Ex: 100.00"
                 value={custo}
                 onChange={(e) => setCusto(e.target.value)}
                 step="0.01"
-                className="focus:ring-orange-500 focus:border-orange-500 border-orange-200"
+                className="focus:ring-blue-500 focus:border-blue-500 border-blue-200"
               />
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block text-orange-800">Margem Desejada (%)</label>
+              <label className="text-sm font-medium mb-2 block text-blue-800">Margem Desejada (%)</label>
               <Input
                 type="number"
                 placeholder="Ex: 20"
                 value={margemDesejada}
                 onChange={(e) => setMargemDesejada(e.target.value)}
                 step="0.1"
-                className="focus:ring-orange-500 focus:border-orange-500 border-orange-200"
+                className="focus:ring-blue-500 focus:border-blue-500 border-blue-200"
               />
             </div>
 
-            <div className="bg-orange-50 p-4 rounded-lg">
-              <div className="text-sm text-orange-700 mb-2 flex items-center">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="text-sm text-blue-700 mb-2 flex items-center">
                 <Truck className="w-4 h-4 mr-2" />
                 Frete Calculado (ML)
               </div>
@@ -199,18 +198,18 @@ export const PricingCalculator: React.FC = () => {
               </div>
             </div>
 
-            <Button onClick={limpar} variant="outline" className="w-full border-orange-200 text-orange-700 hover:bg-orange-50">
+            <Button onClick={limpar} variant="outline" className="w-full border-blue-200 text-blue-700 hover:bg-blue-50">
               <RotateCcw className="w-4 h-4 mr-2" />
               Limpar
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="border-orange-200">
+        <Card className="border-blue-200">
           <CardHeader>
-            <CardTitle className="text-orange-800">Resultados por Plataforma</CardTitle>
+            <CardTitle className="text-blue-800">Resultados por Plataforma</CardTitle>
             {currentStateTaxes && (
-              <div className="text-sm text-orange-600">
+              <div className="text-sm text-blue-600">
                 Estado: {currentStateTaxes.stateName} ({getCurrentTotalTaxes().toFixed(2)}% impostos)
               </div>
             )}
@@ -219,23 +218,23 @@ export const PricingCalculator: React.FC = () => {
             {results.length > 0 ? (
               <div className="space-y-4">
                 {results.map((result, index) => (
-                  <div key={index} className="border border-orange-200 rounded-lg p-4 space-y-2">
+                  <div key={index} className="border border-blue-200 rounded-lg p-4 space-y-2">
                     <div className="flex justify-between items-center">
                       <Badge className={result.color}>{result.name}</Badge>
-                      <span className="text-sm text-orange-600">
+                      <span className="text-sm text-blue-600">
                         Comissão: {result.commission}%
                       </span>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-sm text-orange-600">Preço Final</div>
+                        <div className="text-sm text-blue-600">Preço Final</div>
                         <div className="text-lg font-bold text-green-600">
                           {formatCurrency(result.precoCalculado)}
                         </div>
                       </div>
                       <div>
-                        <div className="text-sm text-orange-600">Margem Real</div>
+                        <div className="text-sm text-blue-600">Margem Real</div>
                         <div className={`text-lg font-bold ${result.margemFinal >= 15 ? 'text-green-600' : result.margemFinal >= 10 ? 'text-yellow-600' : 'text-red-600'}`}>
                           {result.margemFinal.toFixed(1)}%
                         </div>
@@ -243,11 +242,11 @@ export const PricingCalculator: React.FC = () => {
                     </div>
                     
                     <div className="flex justify-between text-sm">
-                      <span className="text-orange-600">Margem Desejada:</span>
+                      <span className="text-blue-600">Margem Desejada:</span>
                       <span className="font-medium">{result.margemDesejada.toFixed(1)}%</span>
                     </div>
                     
-                    <div className="text-xs text-orange-500 bg-orange-50 p-2 rounded space-y-1">
+                    <div className="text-xs text-blue-500 bg-blue-50 p-2 rounded space-y-1">
                       <div>Custo + Frete: {formatCurrency((parseFloat(custo) || 0) + result.frete)}</div>
                       <div>Impostos: {getCurrentTotalTaxes().toFixed(2)}%</div>
                       <div>Frete: {formatCurrency(result.frete)}</div>
@@ -256,8 +255,8 @@ export const PricingCalculator: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center text-orange-500 py-8">
-                <Calculator className="w-12 h-12 mx-auto mb-4 text-orange-300" />
+              <div className="text-center text-blue-500 py-8">
+                <Calculator className="w-12 h-12 mx-auto mb-4 text-blue-300" />
                 <p>Preencha o custo e margem para ver os preços</p>
               </div>
             )}
@@ -265,29 +264,29 @@ export const PricingCalculator: React.FC = () => {
         </Card>
       </div>
 
-      <Card className="border-orange-200">
+      <Card className="border-blue-200">
         <CardHeader>
-          <CardTitle className="text-orange-800">Resumo de Configurações</CardTitle>
+          <CardTitle className="text-blue-800">Resumo de Configurações</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {platforms.map((platform, index) => (
-              <div key={index} className="border border-orange-200 rounded-lg p-4">
+              <div key={index} className="border border-blue-200 rounded-lg p-4">
                 <div className="flex justify-between items-center mb-2">
                   <Badge className={platform.color}>{platform.name}</Badge>
                 </div>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-orange-700">Taxa da Plataforma:</span>
-                    <span className="font-medium text-orange-900">{platform.commission}%</span>
+                    <span className="text-blue-700">Taxa da Plataforma:</span>
+                    <span className="font-medium text-blue-900">{platform.commission}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-orange-700">Impostos Totais:</span>
-                    <span className="font-medium text-orange-900">{getCurrentTotalTaxes().toFixed(2)}%</span>
+                    <span className="text-blue-700">Impostos Totais:</span>
+                    <span className="font-medium text-blue-900">{getCurrentTotalTaxes().toFixed(2)}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-orange-700">Frete ML:</span>
-                    <span className="font-medium text-orange-900">{formatCurrency(getFreightValue())}</span>
+                    <span className="text-blue-700">Frete ML:</span>
+                    <span className="font-medium text-blue-900">{formatCurrency(getFreightValue())}</span>
                   </div>
                 </div>
               </div>
