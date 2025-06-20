@@ -29,8 +29,8 @@ export const Sidebar: React.FC = () => {
   return (
     <div className="w-64 bg-gradient-to-b from-blue-900 via-blue-800 to-blue-900 text-white shadow-2xl">
       <div className="p-6 border-b border-blue-700/50">
-        <h1 className="text-xl font-bold text-blue-200">TirePricePro</h1>
-        <p className="text-sm text-blue-300 mt-1">Sistema de Precificação de Pneus</p>
+        <h1 className="text-xl font-bold text-blue-200">Achei Pneus</h1>
+        <p className="text-sm text-blue-300 mt-1">Sistema de precificação</p>
       </div>
       
       <nav className="mt-6">

@@ -6,28 +6,28 @@ import { TrendingUp, TrendingDown, Package, AlertCircle } from 'lucide-react';
 
 const stats = [
   {
-    title: 'Total de Produtos',
+    title: 'Total de produtos',
     value: '2.847',
     change: '+12%',
     trend: 'up',
     icon: Package,
   },
   {
-    title: 'Margem Média Magalu',
+    title: 'Margem média Magalu',
     value: '18.5%',
     change: '+2.1%',
     trend: 'up',
     icon: TrendingUp,
   },
   {
-    title: 'Margem Média ML Clássico',
+    title: 'Margem média ML Clássico',
     value: '15.2%',
     change: '-0.8%',
     trend: 'down',
     icon: TrendingDown,
   },
   {
-    title: 'Produtos sem Custo',
+    title: 'Produtos sem custo',
     value: '23',
     change: '-5',
     trend: 'up',
@@ -123,7 +123,7 @@ export const Dashboard: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Alertas e Notificações</CardTitle>
+            <CardTitle>Alertas e notificações</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">

@@ -102,8 +102,8 @@ export const PricingCalculator: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-blue-900">Calculadora de Precificação</h1>
-          <p className="text-blue-600 mt-2">Informe o custo e a margem desejada para calcular preços automáticos</p>
+          <h1 className="text-3xl font-bold text-blue-900">Calculadora de precificação</h1>
+          <p className="text-blue-600 mt-2">Informe o custo e a margem desejada para calcular automaticamente o preço.</p>
         </div>
         <Button
           variant="outline"
