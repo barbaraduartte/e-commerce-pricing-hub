@@ -8,7 +8,7 @@ import { Calculator, Save, RotateCcw, Settings, Truck } from 'lucide-react';
 import { usePricing } from '../contexts/PricingContext';
 import { useShipping } from '../contexts/ShippingContext';
 import { StateTaxConfiguration } from './StateTaxConfiguration';
-import { FreightConfiguration } from './FreightConfiguration';
+import { TireFreightConfiguration } from './TireFreightConfiguration';
 import { useToast } from '@/hooks/use-toast';
 
 export const PricingCalculator: React.FC = () => {
@@ -18,9 +18,6 @@ export const PricingCalculator: React.FC = () => {
   
   const [custo, setCusto] = useState<string>('');
   const [margemDesejada, setMargemDesejada] = useState<string>('');
-  const [precoFinal, setPrecoFinal] = useState<string>('');
-  const [distanciaFrete, setDistanciaFrete] = useState<string>('100');
-  const [calculationMode, setCalculationMode] = useState<'margin-to-price' | 'price-to-margin'>('margin-to-price');
   const [showConfig, setShowConfig] = useState<boolean>(false);
   
   const [editingCommissions, setEditingCommissions] = useState<{[key: string]: string}>({});
@@ -30,11 +27,6 @@ export const PricingCalculator: React.FC = () => {
     return custoComFrete / (1 - (margemValue + comissao + impostos) / 100);
   };
 
-  const calcularMargem = (custoValue: number, precoValue: number, comissao: number, impostos: number, frete: number): number => {
-    const custoComFrete = custoValue + frete;
-    return ((precoValue - custoComFrete) / precoValue * 100) - comissao - impostos;
-  };
-
   const getCurrentTotalTaxes = () => {
     const stateTaxes = getCurrentStateTaxes();
     if (!stateTaxes) return 0;
@@ -42,8 +34,7 @@ export const PricingCalculator: React.FC = () => {
   };
 
   const getFreightValue = () => {
-    const distance = parseFloat(distanciaFrete) || 0;
-    return calculateFreight(distance);
+    return calculateFreight();
   };
 
   const formatCurrency = (value: number) => {
@@ -56,22 +47,14 @@ export const PricingCalculator: React.FC = () => {
   const getResults = () => {
     const custoValue = parseFloat(custo) || 0;
     const margemValue = parseFloat(margemDesejada) || 0;
-    const precoValue = parseFloat(precoFinal) || 0;
     const totalTaxes = getCurrentTotalTaxes();
     const freightValue = getFreightValue();
 
-    if (calculationMode === 'margin-to-price' && custoValue && margemValue) {
+    if (custoValue && margemValue) {
       return platforms.map(platform => ({
         ...platform,
         precoCalculado: calcularPreco(custoValue, margemValue, platform.commission, totalTaxes, freightValue),
         margemFinal: margemValue,
-        frete: freightValue,
-      }));
-    } else if (calculationMode === 'price-to-margin' && custoValue && precoValue) {
-      return platforms.map(platform => ({
-        ...platform,
-        precoCalculado: precoValue,
-        margemFinal: calcularMargem(custoValue, precoValue, platform.commission, totalTaxes, freightValue),
         frete: freightValue,
       }));
     }
@@ -84,8 +67,6 @@ export const PricingCalculator: React.FC = () => {
   const limpar = () => {
     setCusto('');
     setMargemDesejada('');
-    setPrecoFinal('');
-    setDistanciaFrete('100');
   };
 
   const saveCommissions = () => {
@@ -109,7 +90,7 @@ export const PricingCalculator: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-orange-900">Calculadora de Precificação</h1>
-          <p className="text-orange-600 mt-2">Calcule preços e margens por plataforma com impostos por estado e frete</p>
+          <p className="text-orange-600 mt-2">Informe o custo e a margem desejada para calcular preços automáticos</p>
         </div>
         <Button
           variant="outline"
@@ -157,7 +138,7 @@ export const PricingCalculator: React.FC = () => {
           </Card>
 
           <StateTaxConfiguration />
-          <FreightConfiguration />
+          <TireFreightConfiguration />
         </div>
       )}
 
@@ -183,77 +164,31 @@ export const PricingCalculator: React.FC = () => {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block text-orange-800 flex items-center">
-                <Truck className="w-4 h-4 mr-1" />
-                Distância para Frete (km)
-              </label>
+              <label className="text-sm font-medium mb-2 block text-orange-800">Margem Desejada (%)</label>
               <Input
                 type="number"
-                placeholder="Ex: 100"
-                value={distanciaFrete}
-                onChange={(e) => setDistanciaFrete(e.target.value)}
-                step="1"
+                placeholder="Ex: 20"
+                value={margemDesejada}
+                onChange={(e) => setMargemDesejada(e.target.value)}
+                step="0.1"
                 className="focus:ring-orange-500 focus:border-orange-500 border-orange-200"
               />
-              <div className="text-xs text-orange-600 mt-1">
-                Frete calculado: {formatCurrency(getFreightValue())}
+            </div>
+
+            <div className="bg-orange-50 p-4 rounded-lg">
+              <div className="text-sm text-orange-700 mb-2 flex items-center">
+                <Truck className="w-4 h-4 mr-2" />
+                Frete Calculado (ML)
+              </div>
+              <div className="text-lg font-bold text-green-600">
+                {formatCurrency(getFreightValue())}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium block text-orange-800">Modo de Cálculo</label>
-              <div className="flex space-x-2">
-                <Button
-                  variant={calculationMode === 'margin-to-price' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setCalculationMode('margin-to-price')}
-                  className={calculationMode === 'margin-to-price' ? 'bg-orange-600 hover:bg-orange-700' : 'border-orange-200 text-orange-700 hover:bg-orange-50'}
-                >
-                  Margem → Preço
-                </Button>
-                <Button
-                  variant={calculationMode === 'price-to-margin' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setCalculationMode('price-to-margin')}
-                  className={calculationMode === 'price-to-margin' ? 'bg-orange-600 hover:bg-orange-700' : 'border-orange-200 text-orange-700 hover:bg-orange-50'}
-                >
-                  Preço → Margem
-                </Button>
-              </div>
-            </div>
-
-            {calculationMode === 'margin-to-price' ? (
-              <div>
-                <label className="text-sm font-medium mb-2 block text-orange-800">Margem Desejada (%)</label>
-                <Input
-                  type="number"
-                  placeholder="Ex: 20"
-                  value={margemDesejada}
-                  onChange={(e) => setMargemDesejada(e.target.value)}
-                  step="0.1"
-                  className="focus:ring-orange-500 focus:border-orange-500 border-orange-200"
-                />
-              </div>
-            ) : (
-              <div>
-                <label className="text-sm font-medium mb-2 block text-orange-800">Preço Final (R$)</label>
-                <Input
-                  type="number"
-                  placeholder="Ex: 150.00"
-                  value={precoFinal}
-                  onChange={(e) => setPrecoFinal(e.target.value)}
-                  step="0.01"
-                  className="focus:ring-orange-500 focus:border-orange-500 border-orange-200"
-                />
-              </div>
-            )}
-
-            <div className="flex space-x-2">
-              <Button onClick={limpar} variant="outline" className="flex-1 border-orange-200 text-orange-700 hover:bg-orange-50">
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Limpar
-              </Button>
-            </div>
+            <Button onClick={limpar} variant="outline" className="w-full border-orange-200 text-orange-700 hover:bg-orange-50">
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Limpar
+            </Button>
           </CardContent>
         </Card>
 
@@ -262,7 +197,7 @@ export const PricingCalculator: React.FC = () => {
             <CardTitle className="text-orange-800">Resultados por Plataforma</CardTitle>
             {currentStateTaxes && (
               <div className="text-sm text-orange-600">
-                Estado selecionado: {currentStateTaxes.stateName} ({getCurrentTotalTaxes().toFixed(2)}% impostos)
+                Estado: {currentStateTaxes.stateName} ({getCurrentTotalTaxes().toFixed(2)}% impostos)
               </div>
             )}
           </CardHeader>
@@ -293,6 +228,7 @@ export const PricingCalculator: React.FC = () => {
                       </div>
                     </div>
                     <div className="text-xs text-orange-500 bg-orange-50 p-2 rounded space-y-1">
+                      <div>Custo + Frete: {formatCurrency((parseFloat(custo) || 0) + result.frete)}</div>
                       <div>Impostos: {getCurrentTotalTaxes().toFixed(2)}%</div>
                       <div>Frete: {formatCurrency(result.frete)}</div>
                     </div>
@@ -302,7 +238,7 @@ export const PricingCalculator: React.FC = () => {
             ) : (
               <div className="text-center text-orange-500 py-8">
                 <Calculator className="w-12 h-12 mx-auto mb-4 text-orange-300" />
-                <p>Preencha os dados para ver os resultados</p>
+                <p>Preencha o custo e margem para ver os preços</p>
               </div>
             )}
           </CardContent>
@@ -330,7 +266,7 @@ export const PricingCalculator: React.FC = () => {
                     <span className="font-medium text-orange-900">{getCurrentTotalTaxes().toFixed(2)}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-orange-700">Frete Estimado:</span>
+                    <span className="text-orange-700">Frete ML:</span>
                     <span className="font-medium text-orange-900">{formatCurrency(getFreightValue())}</span>
                   </div>
                 </div>

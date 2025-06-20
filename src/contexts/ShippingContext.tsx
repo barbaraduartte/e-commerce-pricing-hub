@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface StateTax {
@@ -10,24 +9,23 @@ export interface StateTax {
   cofins: number;
 }
 
-export interface FreightConfig {
-  length: number; // comprimento em cm
-  width: number;  // largura em cm
-  height: number; // altura em cm
-  weight: number; // peso em kg
-  pricePerKm: number; // preço por km
-  baseCost: number; // custo base
+export interface TireConfig {
+  width: number;     // largura (ex: 235)
+  height: number;    // altura (ex: 50)
+  diameter: number;  // aro (ex: 19)
+  quantity: number;  // quantidade (1, 2 ou 4)
 }
 
 interface ShippingContextType {
   stateTaxes: StateTax[];
   selectedState: string;
-  freightConfig: FreightConfig;
+  tireConfig: TireConfig;
   updateStateTax: (state: string, taxes: Omit<StateTax, 'state' | 'stateName'>) => void;
   setSelectedState: (state: string) => void;
-  updateFreightConfig: (config: FreightConfig) => void;
+  updateTireConfig: (config: TireConfig) => void;
   getCurrentStateTaxes: () => StateTax | undefined;
-  calculateFreight: (distance: number) => number;
+  calculateFreight: () => number;
+  calculateVolumetricWeight: () => number;
 }
 
 const ShippingContext = createContext<ShippingContextType | undefined>(undefined);
@@ -62,19 +60,17 @@ const brazilianStates: StateTax[] = [
   { state: 'TO', stateName: 'Tocantins', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
 ];
 
-const defaultFreightConfig: FreightConfig = {
-  length: 60,
-  width: 20,
-  height: 60,
-  weight: 8,
-  pricePerKm: 0.12,
-  baseCost: 15.0,
+const defaultTireConfig: TireConfig = {
+  width: 235,
+  height: 50,
+  diameter: 19,
+  quantity: 1,
 };
 
 export const ShippingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [stateTaxes, setStateTaxes] = useState<StateTax[]>(brazilianStates);
   const [selectedState, setSelectedState] = useState<string>('SP');
-  const [freightConfig, setFreightConfig] = useState<FreightConfig>(defaultFreightConfig);
+  const [tireConfig, setTireConfig] = useState<TireConfig>(defaultTireConfig);
 
   const updateStateTax = (state: string, taxes: Omit<StateTax, 'state' | 'stateName'>) => {
     setStateTaxes(prev => 
@@ -86,32 +82,57 @@ export const ShippingProvider: React.FC<{ children: ReactNode }> = ({ children }
     );
   };
 
-  const updateFreightConfig = (config: FreightConfig) => {
-    setFreightConfig(config);
+  const updateTireConfig = (config: TireConfig) => {
+    setTireConfig(config);
   };
 
   const getCurrentStateTaxes = () => {
     return stateTaxes.find(tax => tax.state === selectedState);
   };
 
-  const calculateFreight = (distance: number) => {
-    // Cálculo baseado em dimensões e peso do produto
-    const volumetricWeight = (freightConfig.length * freightConfig.width * freightConfig.height) / 6000;
-    const finalWeight = Math.max(freightConfig.weight, volumetricWeight);
+  const calculateVolumetricWeight = () => {
+    // Cálculo baseado na sua planilha: (largura * altura * aro * quantidade) / 10000
+    const { width, height, diameter, quantity } = tireConfig;
+    return (width * height * diameter * quantity) / 10000;
+  };
+
+  const calculateFreight = () => {
+    const volumetricWeight = calculateVolumetricWeight();
     
-    return freightConfig.baseCost + (distance * freightConfig.pricePerKm) + (finalWeight * 0.5);
+    // Fórmula exata da sua planilha do Excel
+    if (volumetricWeight === 0) return 0;
+    if (volumetricWeight > 0 && volumetricWeight <= 0.3) return 19.95;
+    if (volumetricWeight > 0.3 && volumetricWeight <= 0.5) return 21.45;
+    if (volumetricWeight > 0.5 && volumetricWeight <= 1) return 22.45;
+    if (volumetricWeight > 1 && volumetricWeight <= 2) return 23.45;
+    if (volumetricWeight > 2 && volumetricWeight <= 3) return 24.95;
+    if (volumetricWeight > 3 && volumetricWeight <= 4) return 26.95;
+    if (volumetricWeight > 4 && volumetricWeight <= 5) return 28.45;
+    if (volumetricWeight > 5 && volumetricWeight <= 9) return 44.45;
+    if (volumetricWeight > 9 && volumetricWeight <= 13) return 65.95;
+    if (volumetricWeight > 13 && volumetricWeight <= 17) return 73.45;
+    if (volumetricWeight > 17 && volumetricWeight <= 23) return 85.95;
+    if (volumetricWeight > 23 && volumetricWeight <= 30) return 98.95;
+    if (volumetricWeight > 30 && volumetricWeight <= 40) return 109.45;
+    if (volumetricWeight > 40 && volumetricWeight <= 50) return 116.95;
+    if (volumetricWeight > 50 && volumetricWeight <= 60) return 124.95;
+    if (volumetricWeight > 60 && volumetricWeight <= 70) return 141.45;
+    if (volumetricWeight > 70 && volumetricWeight <= 80) return 156.95;
+    
+    return 0; // Para valores fora da tabela
   };
 
   return (
     <ShippingContext.Provider value={{
       stateTaxes,
       selectedState,
-      freightConfig,
+      tireConfig,
       updateStateTax,
       setSelectedState,
-      updateFreightConfig,
+      updateTireConfig,
       getCurrentStateTaxes,
       calculateFreight,
+      calculateVolumetricWeight,
     }}>
       {children}
     </ShippingContext.Provider>
