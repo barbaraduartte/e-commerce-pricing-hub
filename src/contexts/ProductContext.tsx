@@ -19,6 +19,8 @@ export interface Product {
 interface ProductContextType {
   products: Product[];
   addProduct: (product: Product) => void;
+  updateProduct: (sku: string, updatedProduct: Partial<Product>) => void;
+  deleteProduct: (sku: string) => void;
   getAllBrands: () => string[];
 }
 
@@ -62,13 +64,27 @@ export const ProductProvider: React.FC<{ children: ReactNode }> = ({ children })
     setProducts(prev => [...prev, product]);
   };
 
+  const updateProduct = (sku: string, updatedProduct: Partial<Product>) => {
+    setProducts(prev => 
+      prev.map(product => 
+        product.sku === sku 
+          ? { ...product, ...updatedProduct, ultimaAlteracao: new Date().toISOString().split('T')[0] }
+          : product
+      )
+    );
+  };
+
+  const deleteProduct = (sku: string) => {
+    setProducts(prev => prev.filter(product => product.sku !== sku));
+  };
+
   const getAllBrands = () => {
     const brands = [...new Set(products.map(product => product.marca))].sort();
     return brands;
   };
 
   return (
-    <ProductContext.Provider value={{ products, addProduct, getAllBrands }}>
+    <ProductContext.Provider value={{ products, addProduct, updateProduct, deleteProduct, getAllBrands }}>
       {children}
     </ProductContext.Provider>
   );

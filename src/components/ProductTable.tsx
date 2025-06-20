@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,16 +18,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Edit, Filter, Download, Upload, Plus } from 'lucide-react';
+import { Edit, Filter, Download, Upload, Plus, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../contexts/ProductContext';
+import { useToast } from '@/hooks/use-toast';
 
 export const ProductTable: React.FC = () => {
   const navigate = useNavigate();
-  const { products, getAllBrands } = useProducts();
+  const { products, getAllBrands, deleteProduct } = useProducts();
+  const { toast } = useToast();
   const [filtroMarca, setFiltroMarca] = useState<string>('all');
   const [filtroBusca, setFiltroBusca] = useState<string>('');
-  const [filtroPlataforma, setFiltroPlataforma] = useState<string>('all');
 
   const brands = getAllBrands();
 
@@ -60,6 +60,27 @@ export const ProductTable: React.FC = () => {
     return 'bg-emerald-100 text-emerald-800';
   };
 
+  const handleDeleteProduct = (sku: string, produto: string) => {
+    if (confirm(`Tem certeza que deseja excluir o produto ${produto}?`)) {
+      deleteProduct(sku);
+      toast({
+        title: "Produto excluído!",
+        description: `O produto ${produto} foi removido com sucesso.`,
+        className: "bg-orange-50 border-orange-200 text-orange-800",
+      });
+    }
+  };
+
+  const handleEditProduct = (sku: string) => {
+    // Por enquanto, apenas exibe um alerta
+    // No futuro, podemos implementar um modal de edição
+    toast({
+      title: "Edição de produto",
+      description: `Funcionalidade de edição para SKU ${sku} será implementada em breve.`,
+      className: "bg-blue-50 border-blue-200 text-blue-800",
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -86,6 +107,7 @@ export const ProductTable: React.FC = () => {
         </div>
       </div>
 
+      
       <Card className="border-orange-200">
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -118,20 +140,6 @@ export const ProductTable: React.FC = () => {
                   {brands.map(marca => (
                     <SelectItem key={marca} value={marca}>{marca}</SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block text-orange-800">Plataforma</label>
-              <Select value={filtroPlataforma} onValueChange={setFiltroPlataforma}>
-                <SelectTrigger className="focus:ring-orange-500 focus:border-orange-500 border-orange-200">
-                  <SelectValue placeholder="Todas as plataformas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as plataformas</SelectItem>
-                  <SelectItem value="magalu">Magalu</SelectItem>
-                  <SelectItem value="ml-classico">ML Clássico</SelectItem>
-                  <SelectItem value="ml-premium">ML Premium</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -204,13 +212,24 @@ export const ProductTable: React.FC = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="hover:bg-orange-100 text-orange-600"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
+                      <div className="flex space-x-1">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="hover:bg-orange-100 text-orange-600"
+                          onClick={() => handleEditProduct(product.sku)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="hover:bg-red-100 text-red-600"
+                          onClick={() => handleDeleteProduct(product.sku, product.produto)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

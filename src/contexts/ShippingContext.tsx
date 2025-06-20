@@ -1,12 +1,10 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface StateTax {
   state: string;
   stateName: string;
-  icms: number;
-  ipi: number;
-  pis: number;
-  cofins: number;
+  taxPercentage: number; // Imposto único personalizado por estado
 }
 
 export interface TireConfig {
@@ -20,7 +18,7 @@ interface ShippingContextType {
   stateTaxes: StateTax[];
   selectedState: string;
   tireConfig: TireConfig;
-  updateStateTax: (state: string, taxes: Omit<StateTax, 'state' | 'stateName'>) => void;
+  updateStateTax: (state: string, taxPercentage: number) => void;
   setSelectedState: (state: string) => void;
   updateTireConfig: (config: TireConfig) => void;
   getCurrentStateTaxes: () => StateTax | undefined;
@@ -31,33 +29,33 @@ interface ShippingContextType {
 const ShippingContext = createContext<ShippingContextType | undefined>(undefined);
 
 const brazilianStates: StateTax[] = [
-  { state: 'AC', stateName: 'Acre', icms: 17.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'AL', stateName: 'Alagoas', icms: 17.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'AP', stateName: 'Amapá', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'AM', stateName: 'Amazonas', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'BA', stateName: 'Bahia', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'CE', stateName: 'Ceará', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'DF', stateName: 'Distrito Federal', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'ES', stateName: 'Espírito Santo', icms: 17.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'GO', stateName: 'Goiás', icms: 17.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'MA', stateName: 'Maranhão', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'MT', stateName: 'Mato Grosso', icms: 17.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'MS', stateName: 'Mato Grosso do Sul', icms: 17.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'MG', stateName: 'Minas Gerais', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'PA', stateName: 'Pará', icms: 17.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'PB', stateName: 'Paraíba', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'PR', stateName: 'Paraná', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'PE', stateName: 'Pernambuco', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'PI', stateName: 'Piauí', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'RJ', stateName: 'Rio de Janeiro', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'RN', stateName: 'Rio Grande do Norte', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'RS', stateName: 'Rio Grande do Sul', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'RO', stateName: 'Rondônia', icms: 17.5, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'RR', stateName: 'Roraima', icms: 17.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'SC', stateName: 'Santa Catarina', icms: 17.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'SP', stateName: 'São Paulo', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'SE', stateName: 'Sergipe', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
-  { state: 'TO', stateName: 'Tocantins', icms: 18.0, ipi: 0.0, pis: 1.65, cofins: 7.6 },
+  { state: 'AC', stateName: 'Acre', taxPercentage: 26.25 },
+  { state: 'AL', stateName: 'Alagoas', taxPercentage: 26.25 },
+  { state: 'AP', stateName: 'Amapá', taxPercentage: 27.25 },
+  { state: 'AM', stateName: 'Amazonas', taxPercentage: 27.25 },
+  { state: 'BA', stateName: 'Bahia', taxPercentage: 27.25 },
+  { state: 'CE', stateName: 'Ceará', taxPercentage: 27.25 },
+  { state: 'DF', stateName: 'Distrito Federal', taxPercentage: 27.25 },
+  { state: 'ES', stateName: 'Espírito Santo', taxPercentage: 26.25 },
+  { state: 'GO', stateName: 'Goiás', taxPercentage: 26.25 },
+  { state: 'MA', stateName: 'Maranhão', taxPercentage: 27.25 },
+  { state: 'MT', stateName: 'Mato Grosso', taxPercentage: 26.25 },
+  { state: 'MS', stateName: 'Mato Grosso do Sul', taxPercentage: 26.25 },
+  { state: 'MG', stateName: 'Minas Gerais', taxPercentage: 27.25 },
+  { state: 'PA', stateName: 'Pará', taxPercentage: 26.25 },
+  { state: 'PB', stateName: 'Paraíba', taxPercentage: 27.25 },
+  { state: 'PR', stateName: 'Paraná', taxPercentage: 27.25 },
+  { state: 'PE', stateName: 'Pernambuco', taxPercentage: 27.25 },
+  { state: 'PI', stateName: 'Piauí', taxPercentage: 27.25 },
+  { state: 'RJ', stateName: 'Rio de Janeiro', taxPercentage: 27.25 },
+  { state: 'RN', stateName: 'Rio Grande do Norte', taxPercentage: 27.25 },
+  { state: 'RS', stateName: 'Rio Grande do Sul', taxPercentage: 27.25 },
+  { state: 'RO', stateName: 'Rondônia', taxPercentage: 26.75 },
+  { state: 'RR', stateName: 'Roraima', taxPercentage: 26.25 },
+  { state: 'SC', stateName: 'Santa Catarina', taxPercentage: 26.25 },
+  { state: 'SP', stateName: 'São Paulo', taxPercentage: 27.25 },
+  { state: 'SE', stateName: 'Sergipe', taxPercentage: 27.25 },
+  { state: 'TO', stateName: 'Tocantins', taxPercentage: 27.25 },
 ];
 
 const defaultTireConfig: TireConfig = {
@@ -72,11 +70,11 @@ export const ShippingProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [selectedState, setSelectedState] = useState<string>('SP');
   const [tireConfig, setTireConfig] = useState<TireConfig>(defaultTireConfig);
 
-  const updateStateTax = (state: string, taxes: Omit<StateTax, 'state' | 'stateName'>) => {
+  const updateStateTax = (state: string, taxPercentage: number) => {
     setStateTaxes(prev => 
       prev.map(stateTax => 
         stateTax.state === state 
-          ? { ...stateTax, ...taxes }
+          ? { ...stateTax, taxPercentage }
           : stateTax
       )
     );

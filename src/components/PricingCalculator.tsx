@@ -27,10 +27,18 @@ export const PricingCalculator: React.FC = () => {
     return custoComFrete / (1 - (margemValue + comissao + impostos) / 100);
   };
 
+  const calcularMargemReal = (precoVenda: number, custoValue: number, frete: number, comissao: number, impostos: number): number => {
+    const custoTotal = custoValue + frete;
+    const comissaoValor = precoVenda * (comissao / 100);
+    const impostosValor = precoVenda * (impostos / 100);
+    const lucro = precoVenda - custoTotal - comissaoValor - impostosValor;
+    return (lucro / precoVenda) * 100;
+  };
+
   const getCurrentTotalTaxes = () => {
     const stateTaxes = getCurrentStateTaxes();
     if (!stateTaxes) return 0;
-    return stateTaxes.icms + stateTaxes.ipi + stateTaxes.pis + stateTaxes.cofins;
+    return stateTaxes.taxPercentage;
   };
 
   const getFreightValue = () => {
@@ -51,12 +59,18 @@ export const PricingCalculator: React.FC = () => {
     const freightValue = getFreightValue();
 
     if (custoValue && margemValue) {
-      return platforms.map(platform => ({
-        ...platform,
-        precoCalculado: calcularPreco(custoValue, margemValue, platform.commission, totalTaxes, freightValue),
-        margemFinal: margemValue,
-        frete: freightValue,
-      }));
+      return platforms.map(platform => {
+        const precoCalculado = calcularPreco(custoValue, margemValue, platform.commission, totalTaxes, freightValue);
+        const margemReal = calcularMargemReal(precoCalculado, custoValue, freightValue, platform.commission, totalTaxes);
+        
+        return {
+          ...platform,
+          precoCalculado,
+          margemFinal: margemReal,
+          margemDesejada: margemValue,
+          frete: freightValue,
+        };
+      });
     }
 
     return [];
@@ -221,12 +235,18 @@ export const PricingCalculator: React.FC = () => {
                         </div>
                       </div>
                       <div>
-                        <div className="text-sm text-orange-600">Margem Líquida</div>
+                        <div className="text-sm text-orange-600">Margem Real</div>
                         <div className={`text-lg font-bold ${result.margemFinal >= 15 ? 'text-green-600' : result.margemFinal >= 10 ? 'text-yellow-600' : 'text-red-600'}`}>
                           {result.margemFinal.toFixed(1)}%
                         </div>
                       </div>
                     </div>
+                    
+                    <div className="flex justify-between text-sm">
+                      <span className="text-orange-600">Margem Desejada:</span>
+                      <span className="font-medium">{result.margemDesejada.toFixed(1)}%</span>
+                    </div>
+                    
                     <div className="text-xs text-orange-500 bg-orange-50 p-2 rounded space-y-1">
                       <div>Custo + Frete: {formatCurrency((parseFloat(custo) || 0) + result.frete)}</div>
                       <div>Impostos: {getCurrentTotalTaxes().toFixed(2)}%</div>

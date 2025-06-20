@@ -13,12 +13,7 @@ export const StateTaxConfiguration: React.FC = () => {
   const { stateTaxes, selectedState, setSelectedState, updateStateTax, getCurrentStateTaxes } = useShipping();
   const { toast } = useToast();
   
-  const [editingTaxes, setEditingTaxes] = useState({
-    icms: '',
-    ipi: '',
-    pis: '',
-    cofins: '',
-  });
+  const [editingTax, setEditingTax] = useState('');
 
   const currentStateTax = getCurrentStateTaxes();
 
@@ -26,45 +21,25 @@ export const StateTaxConfiguration: React.FC = () => {
     setSelectedState(state);
     const stateTax = stateTaxes.find(tax => tax.state === state);
     if (stateTax) {
-      setEditingTaxes({
-        icms: stateTax.icms.toString(),
-        ipi: stateTax.ipi.toString(),
-        pis: stateTax.pis.toString(),
-        cofins: stateTax.cofins.toString(),
-      });
+      setEditingTax(stateTax.taxPercentage.toString());
     }
   };
 
-  const saveTaxes = () => {
+  const saveTax = () => {
     if (currentStateTax) {
-      const newTaxes = {
-        icms: parseFloat(editingTaxes.icms) || 0,
-        ipi: parseFloat(editingTaxes.ipi) || 0,
-        pis: parseFloat(editingTaxes.pis) || 0,
-        cofins: parseFloat(editingTaxes.cofins) || 0,
-      };
-      updateStateTax(selectedState, newTaxes);
+      const newTaxPercentage = parseFloat(editingTax) || 0;
+      updateStateTax(selectedState, newTaxPercentage);
       toast({
-        title: "Impostos atualizados!",
-        description: `Impostos para ${currentStateTax.stateName} foram salvos com sucesso.`,
+        title: "Imposto atualizado!",
+        description: `Imposto para ${currentStateTax.stateName} foi salvo com sucesso.`,
         className: "bg-orange-50 border-orange-200 text-orange-800",
       });
     }
   };
 
-  const getTotalTaxes = () => {
-    if (!currentStateTax) return 0;
-    return currentStateTax.icms + currentStateTax.ipi + currentStateTax.pis + currentStateTax.cofins;
-  };
-
   React.useEffect(() => {
     if (currentStateTax) {
-      setEditingTaxes({
-        icms: currentStateTax.icms.toString(),
-        ipi: currentStateTax.ipi.toString(),
-        pis: currentStateTax.pis.toString(),
-        cofins: currentStateTax.cofins.toString(),
-      });
+      setEditingTax(currentStateTax.taxPercentage.toString());
     }
   }, [currentStateTax]);
 
@@ -101,61 +76,29 @@ export const StateTaxConfiguration: React.FC = () => {
               </Badge>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-1 block">ICMS (%)</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={editingTaxes.icms}
-                  onChange={(e) => setEditingTaxes(prev => ({ ...prev, icms: e.target.value }))}
-                  className="focus:ring-orange-500 focus:border-orange-500"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">IPI (%)</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={editingTaxes.ipi}
-                  onChange={(e) => setEditingTaxes(prev => ({ ...prev, ipi: e.target.value }))}
-                  className="focus:ring-orange-500 focus:border-orange-500"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">PIS (%)</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={editingTaxes.pis}
-                  onChange={(e) => setEditingTaxes(prev => ({ ...prev, pis: e.target.value }))}
-                  className="focus:ring-orange-500 focus:border-orange-500"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-1 block">COFINS (%)</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={editingTaxes.cofins}
-                  onChange={(e) => setEditingTaxes(prev => ({ ...prev, cofins: e.target.value }))}
-                  className="focus:ring-orange-500 focus:border-orange-500"
-                />
-              </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Imposto Total (%)</label>
+              <Input
+                type="number"
+                step="0.01"
+                value={editingTax}
+                onChange={(e) => setEditingTax(e.target.value)}
+                className="focus:ring-orange-500 focus:border-orange-500"
+              />
             </div>
 
             <div className="bg-orange-50 p-3 rounded-lg">
               <div className="text-sm font-medium text-orange-800">
-                Total de Impostos ({currentStateTax.stateName}): {getTotalTaxes().toFixed(2)}%
+                Imposto para {currentStateTax.stateName}: {currentStateTax.taxPercentage.toFixed(2)}%
               </div>
             </div>
 
             <Button 
-              onClick={saveTaxes}
+              onClick={saveTax}
               className="w-full bg-orange-600 hover:bg-orange-700"
             >
               <Save className="w-4 h-4 mr-2" />
-              Salvar Impostos para {currentStateTax.stateName}
+              Salvar Imposto para {currentStateTax.stateName}
             </Button>
           </>
         )}
