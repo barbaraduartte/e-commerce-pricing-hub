@@ -89,7 +89,7 @@ export const ShippingProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   const calculateVolumetricWeight = () => {
-    // Baseado na sua planilha: Largura * Altura * Aro * Quantidade / 10000
+    // Fórmula: (Largura * Altura * Aro * Quantidade) / 10000
     const { width, height, diameter, quantity } = tireConfig;
     return (width * height * diameter * quantity) / 10000;
   };
@@ -97,9 +97,9 @@ export const ShippingProvider: React.FC<{ children: ReactNode }> = ({ children }
   const calculateFreight = () => {
     const W11 = calculateVolumetricWeight();
     
-    // Implementação exata da sua fórmula Excel:
-    // =SE(W11="";"";SE(E(W11>0;W11<=0,3);19,95; SE(E(W11>0,3;W11<=0,5);21,45; ...
-    if (W11 === 0 || W11 === null || W11 === undefined) return 0;
+    // Implementação EXATA da fórmula Excel que você forneceu:
+    if (W11 === 0 || isNaN(W11)) return 0;
+    
     if (W11 > 0 && W11 <= 0.3) return 19.95;
     if (W11 > 0.3 && W11 <= 0.5) return 21.45;
     if (W11 > 0.5 && W11 <= 1) return 22.45;
@@ -118,7 +118,7 @@ export const ShippingProvider: React.FC<{ children: ReactNode }> = ({ children }
     if (W11 > 60 && W11 <= 70) return 141.45;
     if (W11 > 70 && W11 <= 80) return 156.95;
     
-    return 0; // Para valores fora da tabela ou inválidos
+    return 0; // Para valores fora da tabela
   };
 
   return (
