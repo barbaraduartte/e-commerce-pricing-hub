@@ -4,25 +4,13 @@ import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Package, 
-  DollarSign, 
-  History, 
-  Upload, 
-  Download,
-  Users,
-  Settings,
-  Plus
+  DollarSign
 } from 'lucide-react';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
   { icon: Package, label: 'Produtos', path: '/produtos' },
-  { icon: Plus, label: 'Cadastrar Pneu', path: '/cadastrar' },
   { icon: DollarSign, label: 'Precificação', path: '/precificacao' },
-  { icon: History, label: 'Histórico', path: '/historico' },
-  { icon: Upload, label: 'Importar', path: '/importar' },
-  { icon: Download, label: 'Relatórios', path: '/relatorios' },
-  { icon: Users, label: 'Usuários', path: '/usuarios' },
-  { icon: Settings, label: 'Configurações', path: '/configuracoes' },
 ];
 
 export const Sidebar: React.FC = () => {
