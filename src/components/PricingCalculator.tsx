@@ -191,7 +191,7 @@ export const PricingCalculator: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-blue-900">Calculadora de precificação</h1>
+          <h1 className="text-3xl font-bold text-blue-900">Simulador de preço</h1>
           <p className="text-blue-600 mt-2">Selecione um produto pelo SKU e defina a margem ou preço desejado.</p>
         </div>
         <Button
@@ -249,12 +249,12 @@ export const PricingCalculator: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center text-blue-800">
               <Calculator className="w-5 h-5 mr-2" />
-              Dados de Entrada
+              Dados de entrada
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-2 block text-blue-800">Buscar Produto por SKU</label>
+              <label className="text-sm font-medium mb-2 block text-blue-800">Buscar produto por SKU</label>
               <div className="space-y-2">
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-blue-400" />
@@ -298,7 +298,7 @@ export const PricingCalculator: React.FC = () => {
 
             {selectedProduct && (
               <div className="bg-blue-50 p-4 rounded-lg">
-                <div className="text-sm text-blue-700 mb-2">Produto Selecionado:</div>
+                <div className="text-sm text-blue-700 mb-2">Produto selecionado:</div>
                 <div className="text-sm font-medium text-blue-900">{selectedProduct.produto}</div>
                 <div className="text-sm text-blue-700">Marca: {selectedProduct.marca}</div>
                 <div className="text-lg font-bold text-green-600 mt-2">
@@ -308,24 +308,24 @@ export const PricingCalculator: React.FC = () => {
             )}
 
             <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
-              <span className="text-sm font-medium text-gray-700">Tipo de Cálculo:</span>
+              <span className="text-sm font-medium text-gray-700">Tipo de cálculo:</span>
               <div className="flex items-center space-x-2">
                 <span className={`text-sm ${calculoTipo === 'margem' ? 'font-bold text-blue-600' : 'text-gray-500'}`}>
-                  Margem Desejada
+                  Margem desejada
                 </span>
                 <Switch
                   checked={calculoTipo === 'preco'}
                   onCheckedChange={(checked) => setCalculoTipo(checked ? 'preco' : 'margem')}
                 />
                 <span className={`text-sm ${calculoTipo === 'preco' ? 'font-bold text-blue-600' : 'text-gray-500'}`}>
-                  Preço Desejado
+                  Preço desejado
                 </span>
               </div>
             </div>
 
             {calculoTipo === 'margem' ? (
               <div>
-                <label className="text-sm font-medium mb-2 block text-blue-800">Margem Desejada (%)</label>
+                <label className="text-sm font-medium mb-2 block text-blue-800">Margem desejada (%)</label>
                 <Input
                   type="number"
                   placeholder="Ex: 20"
@@ -337,7 +337,7 @@ export const PricingCalculator: React.FC = () => {
               </div>
             ) : (
               <div>
-                <label className="text-sm font-medium mb-2 block text-blue-800">Preço Desejado (R$)</label>
+                <label className="text-sm font-medium mb-2 block text-blue-800">Preço pesejado (R$)</label>
                 <Input
                   type="number"
                   placeholder="Ex: 450.00"
@@ -368,7 +368,7 @@ export const PricingCalculator: React.FC = () => {
 
         <Card className="border-blue-200">
           <CardHeader>
-            <CardTitle className="text-blue-800">Resultados por Plataforma</CardTitle>
+            <CardTitle className="text-blue-800">Resultados por plataforma</CardTitle>
             {currentStateTaxes && (
               <div className="text-sm text-blue-600">
                 Estado: {currentStateTaxes.stateName} ({getCurrentTotalTaxes().toFixed(2)}% impostos)
@@ -390,7 +390,7 @@ export const PricingCalculator: React.FC = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <div className="text-sm text-blue-600 mb-1 flex items-center">
-                          Preço Final
+                          Preço final
                           <Edit3 className="w-3 h-3 ml-1 text-blue-400" />
                         </div>
                         {editingPlatform === result.name ? (
@@ -414,7 +414,7 @@ export const PricingCalculator: React.FC = () => {
                         )}
                       </div>
                       <div>
-                        <div className="text-sm text-blue-600">Margem Real</div>
+                        <div className="text-sm text-blue-600">Margem real</div>
                         <div className={`text-lg font-bold ${result.margemFinal >= 15 ? 'text-green-600' : result.margemFinal >= 10 ? 'text-yellow-600' : 'text-red-600'}`}>
                           {result.margemFinal.toFixed(1)}%
                         </div>
@@ -423,7 +423,7 @@ export const PricingCalculator: React.FC = () => {
                     
                     <div className="flex justify-between text-sm">
                       <span className="text-blue-600">
-                        {calculoTipo === 'margem' ? 'Margem Desejada:' : 'Preço Desejado:'}
+                        {calculoTipo === 'margem' ? 'Margem Desejada:' : 'Preço desejado:'}
                       </span>
                       <span className="font-medium">
                         {calculoTipo === 'margem' 
@@ -462,7 +462,7 @@ export const PricingCalculator: React.FC = () => {
 
       <Card className="border-blue-200">
         <CardHeader>
-          <CardTitle className="text-blue-800">Resumo de Configurações</CardTitle>
+          <CardTitle className="text-blue-800">Resumo de configurações</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -473,11 +473,11 @@ export const PricingCalculator: React.FC = () => {
                 </div>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-blue-700">Taxa da Plataforma:</span>
+                    <span className="text-blue-700">Taxa da plataforma:</span>
                     <span className="font-medium text-blue-900">{platform.commission}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-blue-700">Impostos Totais:</span>
+                    <span className="text-blue-700">Impostos totais:</span>
                     <span className="font-medium text-blue-900">{getCurrentTotalTaxes().toFixed(2)}%</span>
                   </div>
                   <div className="flex justify-between">

@@ -9,8 +9,8 @@ import {
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-  { icon: Package, label: 'Produtos', path: '/produtos' },
-  { icon: DollarSign, label: 'Precificação', path: '/precificacao' },
+  { icon: Package, label: 'Produtos (?)', path: '/produtos' },
+  { icon: DollarSign, label: 'Simulador', path: '/precificacao' },
 ];
 
 export const Sidebar: React.FC = () => {
