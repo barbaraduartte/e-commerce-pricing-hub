@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Calculator, Save, RotateCcw, Settings, Truck, Upload } from 'lucide-react';
+import { Calculator, Save, RotateCcw, Settings, Truck, Upload, Search } from 'lucide-react';
 import { usePricing } from '../contexts/PricingContext';
 import { useShipping } from '../contexts/ShippingContext';
 import { useProducts } from '../contexts/ProductContext';
@@ -21,13 +20,21 @@ export const PricingCalculator: React.FC = () => {
   const { toast } = useToast();
   
   const [selectedSku, setSelectedSku] = useState<string>('');
+  const [skuSearch, setSkuSearch] = useState<string>('');
   const [custo, setCusto] = useState<string>('');
   const [margemDesejada, setMargemDesejada] = useState<string>('');
   const [precoDesejado, setPrecoDesejado] = useState<string>('');
   const [calculoTipo, setCalculoTipo] = useState<'margem' | 'preco'>('margem');
   const [showConfig, setShowConfig] = useState<boolean>(false);
+  const [editingPrices, setEditingPrices] = useState<{[key: string]: string}>({});
   
   const [editingCommissions, setEditingCommissions] = useState<{[key: string]: string}>({});
+
+  // Filtrar produtos baseado na busca
+  const filteredProducts = products.filter(product => 
+    product.sku.toLowerCase().includes(skuSearch.toLowerCase()) ||
+    product.produto.toLowerCase().includes(skuSearch.toLowerCase())
+  );
 
   // Atualizar custo quando SKU é selecionado
   useEffect(() => {
@@ -38,6 +45,12 @@ export const PricingCalculator: React.FC = () => {
       }
     }
   }, [selectedSku, products]);
+
+  // Função para lidar com a seleção por busca de texto
+  const handleSkuSearchSelect = (sku: string) => {
+    setSelectedSku(sku);
+    setSkuSearch(sku);
+  };
 
   const calcularPreco = (custoValue: number, margemValue: number, comissao: number, impostos: number, frete: number): number => {
     const custoComFrete = custoValue + frete;
@@ -77,6 +90,13 @@ export const PricingCalculator: React.FC = () => {
     }).format(value);
   };
 
+  const handlePriceEdit = (platformName: string, newPrice: string) => {
+    setEditingPrices(prev => ({
+      ...prev,
+      [platformName]: newPrice
+    }));
+  };
+
   const getResults = () => {
     const custoValue = parseFloat(custo) || 0;
     const totalTaxes = getCurrentTotalTaxes();
@@ -87,7 +107,12 @@ export const PricingCalculator: React.FC = () => {
         let precoCalculado: number;
         let margemFinal: number;
         
-        if (calculoTipo === 'margem') {
+        // Verificar se há preço editado para esta plataforma
+        const editedPrice = editingPrices[platform.name];
+        if (editedPrice && parseFloat(editedPrice) > 0) {
+          precoCalculado = parseFloat(editedPrice);
+          margemFinal = calcularMargemReal(precoCalculado, custoValue, freightValue, platform.commission, totalTaxes);
+        } else if (calculoTipo === 'margem') {
           const margemValue = parseFloat(margemDesejada) || 0;
           precoCalculado = calcularPreco(custoValue, margemValue, platform.commission, totalTaxes, freightValue);
           margemFinal = calcularMargemReal(precoCalculado, custoValue, freightValue, platform.commission, totalTaxes);
@@ -115,9 +140,11 @@ export const PricingCalculator: React.FC = () => {
 
   const limpar = () => {
     setSelectedSku('');
+    setSkuSearch('');
     setCusto('');
     setMargemDesejada('');
     setPrecoDesejado('');
+    setEditingPrices({});
   };
 
   const saveCommissions = () => {
@@ -212,19 +239,46 @@ export const PricingCalculator: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-2 block text-blue-800">Selecionar Produto (SKU)</label>
-              <Select value={selectedSku} onValueChange={setSelectedSku}>
-                <SelectTrigger className="focus:ring-blue-500 focus:border-blue-500 border-blue-200">
-                  <SelectValue placeholder="Selecione um produto pelo SKU" />
-                </SelectTrigger>
-                <SelectContent>
-                  {products.map((product) => (
-                    <SelectItem key={product.sku} value={product.sku}>
-                      {product.sku} - {product.produto}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium mb-2 block text-blue-800">Buscar Produto por SKU</label>
+              <div className="space-y-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-blue-400" />
+                  <Input
+                    placeholder="Digite o SKU ou nome do produto..."
+                    value={skuSearch}
+                    onChange={(e) => setSkuSearch(e.target.value)}
+                    className="pl-10 focus:ring-blue-500 focus:border-blue-500 border-blue-200"
+                  />
+                </div>
+                
+                {skuSearch && filteredProducts.length > 0 && (
+                  <div className="border border-blue-200 rounded-lg max-h-32 overflow-y-auto">
+                    {filteredProducts.slice(0, 5).map((product) => (
+                      <div
+                        key={product.sku}
+                        className="p-2 hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
+                        onClick={() => handleSkuSearchSelect(product.sku)}
+                      >
+                        <div className="text-sm font-medium text-blue-900">{product.sku}</div>
+                        <div className="text-xs text-blue-600 truncate">{product.produto}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                <Select value={selectedSku} onValueChange={setSelectedSku}>
+                  <SelectTrigger className="focus:ring-blue-500 focus:border-blue-500 border-blue-200">
+                    <SelectValue placeholder="Ou selecione da lista completa" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {products.map((product) => (
+                      <SelectItem key={product.sku} value={product.sku}>
+                        {product.sku} - {product.produto}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {selectedProduct && (
@@ -320,10 +374,14 @@ export const PricingCalculator: React.FC = () => {
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-sm text-blue-600">Preço Final</div>
-                        <div className="text-lg font-bold text-green-600">
-                          {formatCurrency(result.precoCalculado)}
-                        </div>
+                        <div className="text-sm text-blue-600 mb-1">Preço Final (Editável)</div>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={formatCurrency(result.precoCalculado).replace('R$', '').replace('.', '').replace(',', '.')}
+                          onChange={(e) => handlePriceEdit(result.name, e.target.value)}
+                          className="text-lg font-bold text-green-600 focus:ring-blue-500 focus:border-blue-500"
+                        />
                       </div>
                       <div>
                         <div className="text-sm text-blue-600">Margem Real</div>
