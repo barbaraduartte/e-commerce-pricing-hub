@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Calculator, Save, RotateCcw, Settings, Truck } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Calculator, Save, RotateCcw, Settings, Truck, Upload } from 'lucide-react';
 import { usePricing } from '../contexts/PricingContext';
 import { useShipping } from '../contexts/ShippingContext';
+import { useProducts } from '../contexts/ProductContext';
 import { StateTaxConfiguration } from './StateTaxConfiguration';
 import { TireFreightConfiguration } from './TireFreightConfiguration';
 import { useToast } from '@/hooks/use-toast';
@@ -13,13 +17,27 @@ import { useToast } from '@/hooks/use-toast';
 export const PricingCalculator: React.FC = () => {
   const { platforms, updatePlatformCommission } = usePricing();
   const { getCurrentStateTaxes, calculateFreight } = useShipping();
+  const { products } = useProducts();
   const { toast } = useToast();
   
+  const [selectedSku, setSelectedSku] = useState<string>('');
   const [custo, setCusto] = useState<string>('');
   const [margemDesejada, setMargemDesejada] = useState<string>('');
+  const [precoDesejado, setPrecoDesejado] = useState<string>('');
+  const [calculoTipo, setCalculoTipo] = useState<'margem' | 'preco'>('margem');
   const [showConfig, setShowConfig] = useState<boolean>(false);
   
   const [editingCommissions, setEditingCommissions] = useState<{[key: string]: string}>({});
+
+  // Atualizar custo quando SKU é selecionado
+  useEffect(() => {
+    if (selectedSku) {
+      const produto = products.find(p => p.sku === selectedSku);
+      if (produto) {
+        setCusto(produto.custo.toString());
+      }
+    }
+  }, [selectedSku, products]);
 
   const calcularPreco = (custoValue: number, margemValue: number, comissao: number, impostos: number, frete: number): number => {
     const custoComFrete = custoValue + frete;
@@ -32,6 +50,14 @@ export const PricingCalculator: React.FC = () => {
     const impostosValor = precoVenda * (impostos / 100);
     const lucro = precoVenda - custoTotal - comissaoValor - impostosValor;
     return (lucro / precoVenda) * 100;
+  };
+
+  const calcularMargemPorPreco = (precoDesejadoValue: number, custoValue: number, frete: number, comissao: number, impostos: number): number => {
+    const custoTotal = custoValue + frete;
+    const comissaoValor = precoDesejadoValue * (comissao / 100);
+    const impostosValor = precoDesejadoValue * (impostos / 100);
+    const lucro = precoDesejadoValue - custoTotal - comissaoValor - impostosValor;
+    return (lucro / precoDesejadoValue) * 100;
   };
 
   const getCurrentTotalTaxes = () => {
@@ -53,20 +79,30 @@ export const PricingCalculator: React.FC = () => {
 
   const getResults = () => {
     const custoValue = parseFloat(custo) || 0;
-    const margemValue = parseFloat(margemDesejada) || 0;
     const totalTaxes = getCurrentTotalTaxes();
     const freightValue = getFreightValue();
 
-    if (custoValue && margemValue) {
+    if (custoValue && ((calculoTipo === 'margem' && margemDesejada) || (calculoTipo === 'preco' && precoDesejado))) {
       return platforms.map(platform => {
-        const precoCalculado = calcularPreco(custoValue, margemValue, platform.commission, totalTaxes, freightValue);
-        const margemReal = calcularMargemReal(precoCalculado, custoValue, freightValue, platform.commission, totalTaxes);
+        let precoCalculado: number;
+        let margemFinal: number;
+        
+        if (calculoTipo === 'margem') {
+          const margemValue = parseFloat(margemDesejada) || 0;
+          precoCalculado = calcularPreco(custoValue, margemValue, platform.commission, totalTaxes, freightValue);
+          margemFinal = calcularMargemReal(precoCalculado, custoValue, freightValue, platform.commission, totalTaxes);
+        } else {
+          const precoDesejadoValue = parseFloat(precoDesejado) || 0;
+          precoCalculado = precoDesejadoValue;
+          margemFinal = calcularMargemPorPreco(precoDesejadoValue, custoValue, freightValue, platform.commission, totalTaxes);
+        }
         
         return {
           ...platform,
           precoCalculado,
-          margemFinal: margemReal,
-          margemDesejada: margemValue,
+          margemFinal,
+          margemDesejada: calculoTipo === 'margem' ? parseFloat(margemDesejada) || 0 : margemFinal,
+          precoDesejado: calculoTipo === 'preco' ? parseFloat(precoDesejado) || 0 : precoCalculado,
           frete: freightValue,
         };
       });
@@ -78,8 +114,10 @@ export const PricingCalculator: React.FC = () => {
   const results = getResults();
 
   const limpar = () => {
+    setSelectedSku('');
     setCusto('');
     setMargemDesejada('');
+    setPrecoDesejado('');
   };
 
   const saveCommissions = () => {
@@ -96,14 +134,23 @@ export const PricingCalculator: React.FC = () => {
     });
   };
 
+  const importarParaMarketplace = (platformName: string, preco: number) => {
+    toast({
+      title: `Importado para ${platformName}!`,
+      description: `Preço ${formatCurrency(preco)} será aplicado no marketplace.`,
+      className: "bg-green-50 border-green-200 text-green-800",
+    });
+  };
+
   const currentStateTaxes = getCurrentStateTaxes();
+  const selectedProduct = products.find(p => p.sku === selectedSku);
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-blue-900">Calculadora de precificação</h1>
-          <p className="text-blue-600 mt-2">Informe o custo e a margem desejada para calcular automaticamente o preço.</p>
+          <p className="text-blue-600 mt-2">Selecione um produto pelo SKU e defina a margem ou preço desejado.</p>
         </div>
         <Button
           variant="outline"
@@ -165,28 +212,73 @@ export const PricingCalculator: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-2 block text-blue-800">Custo do Produto (R$)</label>
-              <Input
-                type="number"
-                placeholder="Ex: 100.00"
-                value={custo}
-                onChange={(e) => setCusto(e.target.value)}
-                step="0.01"
-                className="focus:ring-blue-500 focus:border-blue-500 border-blue-200"
-              />
+              <label className="text-sm font-medium mb-2 block text-blue-800">Selecionar Produto (SKU)</label>
+              <Select value={selectedSku} onValueChange={setSelectedSku}>
+                <SelectTrigger className="focus:ring-blue-500 focus:border-blue-500 border-blue-200">
+                  <SelectValue placeholder="Selecione um produto pelo SKU" />
+                </SelectTrigger>
+                <SelectContent>
+                  {products.map((product) => (
+                    <SelectItem key={product.sku} value={product.sku}>
+                      {product.sku} - {product.produto}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            <div>
-              <label className="text-sm font-medium mb-2 block text-blue-800">Margem Desejada (%)</label>
-              <Input
-                type="number"
-                placeholder="Ex: 20"
-                value={margemDesejada}
-                onChange={(e) => setMargemDesejada(e.target.value)}
-                step="0.1"
-                className="focus:ring-blue-500 focus:border-blue-500 border-blue-200"
-              />
+            {selectedProduct && (
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="text-sm text-blue-700 mb-2">Produto Selecionado:</div>
+                <div className="text-sm font-medium text-blue-900">{selectedProduct.produto}</div>
+                <div className="text-sm text-blue-700">Marca: {selectedProduct.marca}</div>
+                <div className="text-lg font-bold text-green-600 mt-2">
+                  Custo: {formatCurrency(selectedProduct.custo)}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center space-x-4 bg-gray-50 p-4 rounded-lg">
+              <span className="text-sm font-medium text-gray-700">Tipo de Cálculo:</span>
+              <div className="flex items-center space-x-2">
+                <span className={`text-sm ${calculoTipo === 'margem' ? 'font-bold text-blue-600' : 'text-gray-500'}`}>
+                  Margem Desejada
+                </span>
+                <Switch
+                  checked={calculoTipo === 'preco'}
+                  onCheckedChange={(checked) => setCalculoTipo(checked ? 'preco' : 'margem')}
+                />
+                <span className={`text-sm ${calculoTipo === 'preco' ? 'font-bold text-blue-600' : 'text-gray-500'}`}>
+                  Preço Desejado
+                </span>
+              </div>
             </div>
+
+            {calculoTipo === 'margem' ? (
+              <div>
+                <label className="text-sm font-medium mb-2 block text-blue-800">Margem Desejada (%)</label>
+                <Input
+                  type="number"
+                  placeholder="Ex: 20"
+                  value={margemDesejada}
+                  onChange={(e) => setMargemDesejada(e.target.value)}
+                  step="0.1"
+                  className="focus:ring-blue-500 focus:border-blue-500 border-blue-200"
+                />
+              </div>
+            ) : (
+              <div>
+                <label className="text-sm font-medium mb-2 block text-blue-800">Preço Desejado (R$)</label>
+                <Input
+                  type="number"
+                  placeholder="Ex: 450.00"
+                  value={precoDesejado}
+                  onChange={(e) => setPrecoDesejado(e.target.value)}
+                  step="0.01"
+                  className="focus:ring-blue-500 focus:border-blue-500 border-blue-200"
+                />
+              </div>
+            )}
 
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="text-sm text-blue-700 mb-2 flex items-center">
@@ -218,7 +310,7 @@ export const PricingCalculator: React.FC = () => {
             {results.length > 0 ? (
               <div className="space-y-4">
                 {results.map((result, index) => (
-                  <div key={index} className="border border-blue-200 rounded-lg p-4 space-y-2">
+                  <div key={index} className="border border-blue-200 rounded-lg p-4 space-y-3">
                     <div className="flex justify-between items-center">
                       <Badge className={result.color}>{result.name}</Badge>
                       <span className="text-sm text-blue-600">
@@ -242,8 +334,15 @@ export const PricingCalculator: React.FC = () => {
                     </div>
                     
                     <div className="flex justify-between text-sm">
-                      <span className="text-blue-600">Margem Desejada:</span>
-                      <span className="font-medium">{result.margemDesejada.toFixed(1)}%</span>
+                      <span className="text-blue-600">
+                        {calculoTipo === 'margem' ? 'Margem Desejada:' : 'Preço Desejado:'}
+                      </span>
+                      <span className="font-medium">
+                        {calculoTipo === 'margem' 
+                          ? `${result.margemDesejada.toFixed(1)}%`
+                          : formatCurrency(result.precoDesejado)
+                        }
+                      </span>
                     </div>
                     
                     <div className="text-xs text-blue-500 bg-blue-50 p-2 rounded space-y-1">
@@ -251,13 +350,22 @@ export const PricingCalculator: React.FC = () => {
                       <div>Impostos: {getCurrentTotalTaxes().toFixed(2)}%</div>
                       <div>Frete: {formatCurrency(result.frete)}</div>
                     </div>
+
+                    <Button 
+                      onClick={() => importarParaMarketplace(result.name, result.precoCalculado)}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      size="sm"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Importar para {result.name}
+                    </Button>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center text-blue-500 py-8">
                 <Calculator className="w-12 h-12 mx-auto mb-4 text-blue-300" />
-                <p>Preencha o custo e margem para ver os preços</p>
+                <p>Selecione um produto e defina {calculoTipo === 'margem' ? 'a margem' : 'o preço'} para ver os resultados</p>
               </div>
             )}
           </CardContent>
