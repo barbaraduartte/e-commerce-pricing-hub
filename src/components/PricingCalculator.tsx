@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Calculator, Save, RotateCcw, Settings, Truck, Upload, Search } from 'lucide-react';
+import { Calculator, Save, RotateCcw, Settings, Truck, Upload, Search, Edit3 } from 'lucide-react';
 import { usePricing } from '../contexts/PricingContext';
 import { useShipping } from '../contexts/ShippingContext';
 import { useProducts } from '../contexts/ProductContext';
@@ -27,6 +27,7 @@ export const PricingCalculator: React.FC = () => {
   const [calculoTipo, setCalculoTipo] = useState<'margem' | 'preco'>('margem');
   const [showConfig, setShowConfig] = useState<boolean>(false);
   const [editingPrices, setEditingPrices] = useState<{[key: string]: string}>({});
+  const [editingPlatform, setEditingPlatform] = useState<string | null>(null);
   
   const [editingCommissions, setEditingCommissions] = useState<{[key: string]: string}>({});
 
@@ -95,6 +96,20 @@ export const PricingCalculator: React.FC = () => {
       ...prev,
       [platformName]: newPrice
     }));
+  };
+
+  const handlePriceClick = (platformName: string) => {
+    setEditingPlatform(platformName);
+  };
+
+  const handlePriceBlur = () => {
+    setEditingPlatform(null);
+  };
+
+  const handlePriceKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      setEditingPlatform(null);
+    }
   };
 
   const getResults = () => {
@@ -374,14 +389,29 @@ export const PricingCalculator: React.FC = () => {
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-sm text-blue-600 mb-1">Preço Final (Editável)</div>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={formatCurrency(result.precoCalculado).replace('R$', '').replace('.', '').replace(',', '.')}
-                          onChange={(e) => handlePriceEdit(result.name, e.target.value)}
-                          className="text-lg font-bold text-green-600 focus:ring-blue-500 focus:border-blue-500"
-                        />
+                        <div className="text-sm text-blue-600 mb-1 flex items-center">
+                          Preço Final
+                          <Edit3 className="w-3 h-3 ml-1 text-blue-400" />
+                        </div>
+                        {editingPlatform === result.name ? (
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={editingPrices[result.name] || result.precoCalculado.toFixed(2)}
+                            onChange={(e) => handlePriceEdit(result.name, e.target.value)}
+                            onBlur={handlePriceBlur}
+                            onKeyPress={handlePriceKeyPress}
+                            className="text-lg font-bold text-green-600 focus:ring-blue-500 focus:border-blue-500"
+                            autoFocus
+                          />
+                        ) : (
+                          <div
+                            className="text-lg font-bold text-green-600 cursor-pointer hover:bg-blue-50 p-2 rounded border-2 border-transparent hover:border-blue-200 transition-all"
+                            onClick={() => handlePriceClick(result.name)}
+                          >
+                            {formatCurrency(result.precoCalculado)}
+                          </div>
+                        )}
                       </div>
                       <div>
                         <div className="text-sm text-blue-600">Margem Real</div>
