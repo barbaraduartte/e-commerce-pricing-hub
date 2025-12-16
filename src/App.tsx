@@ -11,6 +11,8 @@ import { PricingCalculator } from "./components/PricingCalculator";
 import { ProductProvider } from "./contexts/ProductContext";
 import { PricingProvider } from "./contexts/PricingContext";
 import { ShippingProvider } from "./contexts/ShippingContext";
+import { AutoPricingProvider } from "./contexts/AutoPricingContext";
+import { AutoPricingModule } from "./pages/AutoPricing";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,18 +23,21 @@ const App = () => (
       <ProductProvider>
         <PricingProvider>
           <ShippingProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Layout>
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/produtos" element={<ProductTable />} />
-                  <Route path="/precificacao" element={<PricingCalculator />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Layout>
-            </BrowserRouter>
+            <AutoPricingProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/produtos" element={<ProductTable />} />
+                    <Route path="/precificacao" element={<PricingCalculator />} />
+                    <Route path="/precificacao-inteligente/*" element={<AutoPricingModule />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Layout>
+              </BrowserRouter>
+            </AutoPricingProvider>
           </ShippingProvider>
         </PricingProvider>
       </ProductProvider>
