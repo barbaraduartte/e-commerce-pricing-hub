@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Search, Filter, Play, Pause, Pencil, History, Trash2, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +33,7 @@ import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 
 export const RulesList: React.FC = () => {
+  const navigate = useNavigate();
   const { rules, toggleRuleStatus, deleteRule } = useAutoPricing();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<RuleStatus | 'all'>('all');
@@ -92,7 +94,7 @@ export const RulesList: React.FC = () => {
             Gerencie suas regras de precificação automática
           </p>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => navigate('/precificacao-inteligente/regras/nova')}>
           <Plus className="w-4 h-4" />
           Nova Regra
         </Button>
@@ -152,7 +154,7 @@ export const RulesList: React.FC = () => {
                   : 'Crie sua primeira regra de precificação automática'}
               </p>
               {!searchTerm && statusFilter === 'all' && (
-                <Button className="gap-2">
+                <Button className="gap-2" onClick={() => navigate('/precificacao-inteligente/regras/nova')}>
                   <Plus className="w-4 h-4" />
                   Criar Primeira Regra
                 </Button>
@@ -220,7 +222,7 @@ export const RulesList: React.FC = () => {
                         </>
                       )}
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-1">
+                    <Button variant="outline" size="sm" className="gap-1" onClick={() => navigate(`/precificacao-inteligente/regras/${rule.id}/editar`)}>
                       <Pencil className="w-4 h-4" />
                       Editar
                     </Button>
