@@ -81,6 +81,10 @@ export const RulesList: React.FC = () => {
     return '~';
   };
 
+  const activeRules = rules.filter(r => r.status === 'active').length;
+  const pausedRules = rules.filter(r => r.status === 'paused').length;
+  const draftRules = rules.filter(r => r.status === 'draft').length;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -98,6 +102,42 @@ export const RulesList: React.FC = () => {
           <Plus className="w-4 h-4" />
           Nova Regra
         </Button>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-primary">{rules.length}</p>
+              <p className="text-sm text-muted-foreground">Total de Regras</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-green-500">{activeRules}</p>
+              <p className="text-sm text-muted-foreground">Ativas</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-yellow-500">{pausedRules}</p>
+              <p className="text-sm text-muted-foreground">Pausadas</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-4">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-muted-foreground">{draftRules}</p>
+              <p className="text-sm text-muted-foreground">Rascunhos</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}
@@ -226,7 +266,12 @@ export const RulesList: React.FC = () => {
                       <Pencil className="w-4 h-4" />
                       Editar
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-1"
+                      onClick={() => navigate('/precificacao-inteligente/execucoes')}
+                    >
                       <History className="w-4 h-4" />
                       Histórico
                     </Button>
